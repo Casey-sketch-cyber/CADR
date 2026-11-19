@@ -10,6 +10,8 @@ This repository accompanies *Censored-ACK State Reconstruction for Frozen
 Offline Policies under Hidden Non-Stationary Observation Delays*.
 [Read the author manuscript (PDF, 2026-11-02)](docs/CADR.pdf).
 
+> **Revision in progress (2026-11):** see [docs/revision/README.md](docs/revision/README.md) for the post-rejection analysis, task plan and data-recovery guide. AI agents: read [GEMINI.md](GEMINI.md) / [AGENTS.md](AGENTS.md) first.
+
 ## What is included
 
 - CADR age estimation, delayed channels, dynamics ensembles, and policy interfaces.
