@@ -24,14 +24,23 @@
 | 阶段 | 内容 | 需要数据/GPU | 通过条件 |
 |---|---|---|---|
 | P1 代码 | T1–T5、T8b 的实现 + 单元测试 | 否（CPU） | Claude 审核每个 PR |
-| P0 数据 | 按 DATA_RECOVERY.md 重建 Hopper + PickCube 的数据与基础 checkpoint（2 个 seed：101、102） | 是 | 直接策略在无时延下的分数与原论文同量级 |
-| P2 快速验证 | 在 Hopper（IQL）与 PickCube（DP）上跑 T6 的核心对照，2 个 seed | 是 | **决策关口**：Claude 根据结果决定继续路线 A，还是转向路线 B |
-| P3 完整矩阵 | 10 个任务 × 5 个 seed + trace 回放 + T7 | 是 | Claude 审核 |
+| P0 恢复 | 按 DATA_RECOVERY.md 复制 Hopper + PickCube 的正式权重，重新下载对应数据并校验 SHA-256 | 是 | 全部哈希一致 |
+| T0 复现关口 | 用恢复的权重和 **v1 原配置** 重跑 Hopper seed101、PickCube seed101，与原 `episodes.csv` 逐回合比对 | 是（只评测） | 回报或成功率逐回合一致；硬件不同时允许浮点级差异，但必须量化并报告 |
+| P2 快速验证 | 在 Hopper（IQL）与 PickCube（DP）上跑 T6 的核心对照：先 2 个 seed，结果清楚后补到 5 个 | 是（只评测） | **决策关口**：Claude 根据结果决定继续路线 A，还是转向路线 B |
+| P3 完整矩阵 | 10 个任务 × 5 个 seed + trace 回放（5 条 trace 都在）+ T7 | 是（只评测） | Claude 审核 |
 | P4 论文 | 重写（Claude 主导，按 paperwrite skill） | — | — |
 
-P1 不依赖数据，可以与 P0 并行。**P3 只在 P2 关口通过后才开始**，避免白跑整个矩阵。
+**本轮修订不重训任何模型**：作者本地保留了全部 155 个正式权重（10 个任务 × 5 个 seed，见 `handoff/checkpoint_index.csv`）。T1–T6 都只改部署期逻辑，直接加载冻结权重评测即可。这本身也符合论文“冻结策略、即插即用”的设定。不要重训；遇到确实需要训练的情况，先在 PR 里说明。
+
+P1 不依赖数据，可以与 P0 并行。T0 不通过（旧配置跑不出旧结果），不要往下做。**P3 只在 P2 关口通过后才开始**。
 
 ## 2. 任务明细
+
+### T0 旧结果复现关口【P0 之后，任何新实验之前】
+
+- 用 `configs/generated_formal_v1_hopper_cadr_seed101.json` 和 `configs/generated_formal_v1_pickcube_synthetic_seed101.json`（交接文档 §5 有完整命令），加载恢复的权重，输出到新目录 `runs/recovery_*`。
+- 与原 `artifacts/remote/formal_v1_{minari,maniskill}_synthetic/episodes.csv` 中对应任务、seed、方法、场景的逐回合结果比对，写成 `scripts/revision/compare_episodes.py`（输入两个 episodes.csv 和筛选条件，输出逐回合差异、最大绝对差、均值差）。
+- 必须在 P1 代码合入**之前**跑一次，并在合入之后用 legacy 配置再跑一次，证明新代码不改变旧行为。
 
 ### T1 用风险率后验替换 Eq.(9)/(10)【P1，最高优先级】
 
@@ -107,6 +116,10 @@ p_t(k) = w(k) / Σ_{u≤K} w(u)
 | replan_every_step | 仅 PickCube（原有） |
 
 IQL 额外比较三种聚合方式，新增配置项 `aggregation: action_mean | state_mean | map`。
+
+single_model 的做法：
+- PickCube 有专门训练的单模型权重（`ablation_v1_dp_dynamics_single_model_pickcube_*`），沿用原做法。
+- Hopper/Walker2d 没有单独训练的单模型。用部署期配置 `ensemble_members: [0]`，只用集成里的第 0 个成员，并在结果表中注明这和 PickCube 的做法不同。
 - P2：2 个 seed × 20 episode。
 - P3：5 个 seed × 20 episode，沿用论文的配对设计与层次 bootstrap。
 
@@ -138,6 +151,7 @@ IQL 额外比较三种聚合方式，新增配置项 `aggregation: action_mean |
 ## 3. 完成后的交付清单
 
 - [ ] T1–T5、T8b 的 PR 已合并（P1）
-- [ ] Hopper + PickCube 数据与 checkpoint 重建，记录在 `results/revision/P0/env_record.md`（P0）
+- [ ] Hopper + PickCube 权重复制、数据下载并通过 SHA-256 校验，记录在 `results/revision/P0/env_record.md`（P0）
+- [ ] T0 复现比对报告 `results/revision/T0/reproduction.md`，含逐回合差异统计（T0）
 - [ ] P2 结果表 + 四个问题的回答（P2）
 - [ ] 完整矩阵 + trace + T7（P3）

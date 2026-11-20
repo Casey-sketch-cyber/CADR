@@ -16,6 +16,8 @@
 - [ ] 没有未来信息泄漏：ACK 只在 revealed_step 及之后使用；动作只用已执行的
 
 ## 实验
+- [ ] T0 已通过：legacy 配置与原 episodes.csv 逐回合一致（或差异已量化并解释）
+- [ ] 加载的是 `role=preferred` 权重，SHA-256 与索引一致；没有重训
 - [ ] 配对设计：各方法使用相同的环境初始化和时延轨迹 seed
 - [ ] 报告了 seed 数、episode 数、均值、95% 层次 bootstrap 区间
 - [ ] 同时报告绝对分数和无时延参考

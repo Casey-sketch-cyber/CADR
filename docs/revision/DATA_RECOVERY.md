@@ -1,78 +1,72 @@
-# 数据与 checkpoint 重建（服务器数据已删除）
+# 数据与 checkpoint 恢复（2026-11-20 更新）
 
-原服务器上的数据集、checkpoint、处理后的 trace 都已不存在。**所有基础策略、动力学模型都必须重训**（seed 101–105）。先只重建 P2 需要的部分：Hopper + PickCube，seed 101、102。
+**结论：不需要重训任何模型。** 服务器数据删除了，但作者本地（Windows，`D:/PROJECT/lzt/research/dt-corl-delay`）保留了全部正式权重、5 条网络 trace 和原始结果。需要重新下载的只有 Minari 数据集和 ManiSkill 演示。
 
-> 下面的命令以仓库现有入口为准；标“需核实”的步骤请先对照上游 v3.0.1 文档，把实际使用的命令写进 PR。
+完整交接说明见 [handoff/RECOVERY_HANDOFF_2026-11-19.md](handoff/RECOVERY_HANDOFF_2026-11-19.md)，逐文件索引（路径、字节数、SHA-256）见 [handoff/checkpoint_index.csv](handoff/checkpoint_index.csv) 和 [handoff/data_index.csv](handoff/data_index.csv)。
 
-## 1. 环境
+## 1. 现状一览
 
-- Minari 线：`requirements-research.in`（记录环境为 PyTorch 2.8.0 + CUDA 12.8、Minari 0.5.3、MuJoCo 3.2.3）。
-- ManiSkill 线：`requirements-maniskill.in` + `requirements-maniskill-dp.in`（Gymnasium 0.29.1）。**必须与 Minari 线分开建环境。**
-- 把实际安装的版本记录到 `results/revision/P0/env_record.md`（`pip freeze` 摘要 + GPU 型号 + CUDA 版本）。
+| 资源 | 状态 | 做法 |
+|---|---|---|
+| 正式权重：IQL、CQL、CADR 动力学、DT-CORL 适配器、官方 DP、CADR-DP 动力学、PickCube 单模型消融 | **本地都在**：155 个 `role=preferred`，10 个任务 × 5 个 seed 全覆盖，SHA-256 已核对 | 从本地 `artifacts/remote/<运行名>/` 复制到服务器 `runs/<运行名>/`，复制后按 `recorded_sha256` 校验 |
+| 网络 trace：3 条 5G + 2 条 WiFi | **本地都在**，已与历史校验一致 | 按相同相对路径复制到 `data/processed/` |
+| 原论文结果：`episodes.csv`、`main_aggregate.csv` 等 | **本地都在** | 复制到 `artifacts/remote/formal_v1_*`，供 T0 逐回合比对 |
+| Minari 7 个数据集 `main_data.hdf5` | 缺失（metadata 和下载清单在） | 重新下载，按 `data_index.csv` 的字节数和 SHA-256 校验，**必须完全一致** |
+| ManiSkill 3 个任务的原始和转换后演示 | 缺失 | 重新下载并回放转换。CADR-DP 评测要读取完整回放文件 |
 
-## 2. 离线数据集（公开，可重新下载）
+## 2. 只恢复本轮需要的（按阶段）
 
-| 任务组 | dataset_id |
-|---|---|
-| Locomotion | `mujoco/halfcheetah/medium-v0`, `mujoco/hopper/medium-v0`, `mujoco/walker2d/medium-v0` |
-| Adroit | `D4RL/door/expert-v2`, `D4RL/hammer/expert-v2`, `D4RL/pen/expert-v2`, `D4RL/relocate/expert-v2` |
+| 阶段 | 任务 | 需要的权重 | 需要的数据 |
+|---|---|---|---|
+| T0 / P2 | Hopper | `formal_v1_iql_hopper_seed{101..105}`、`formal_v1_cadr_hopper_seed{…}`（P2 加 `formal_v1_dtcorl_hopper_*`） | `mujoco/hopper/medium-v0` |
+| T0 / P2 | PickCube | `formal_v1_dp_pickcube_seed{…}/checkpoints/best_eval_success_once.pt`、`formal_v1_dp_dynamics_pickcube_seed{…}`、`ablation_v1_dp_dynamics_single_model_pickcube_seed{…}` | PickCube-v1 演示（下载 + 转换） |
+| P3 | 其余 8 个任务 | 按 `checkpoint_index.csv` 筛选 `role=preferred` | 其余 Minari 数据集与 ManiSkill 演示；5 条 trace |
 
-```bash
-export MINARI_DATASETS_PATH=$PWD/datasets/minari
-python -m dt_corl_delay.download_minari_exact --dataset mujoco/hopper/medium-v0 --datasets-root datasets/minari
-# P3 时再下载其余 ID
-```
+`role=archive_only` 的 498 个文件是留档快照，**不要使用**。
 
-## 3. ManiSkill 演示（公开，需要下载 + 回放转换）
+## 3. 下载与校验
 
-配置期望的路径：
-
-```
-data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.h5
-data/maniskill/processed/StackCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.h5
-data/maniskill/processed/PegInsertionSide-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pose.physx_cpu.h5
-```
-
-步骤（需核实，ManiSkill 版本固定为 3.0.1，commit `a4a4f92`）：
+### Minari
 
 ```bash
-python -m mani_skill.utils.download_demo PickCube-v1
-python -m mani_skill.trajectory.replay_trajectory \
-  --traj-path <下载目录>/PickCube-v1/motionplanning/trajectory.h5 \
+export PYTHONPATH="$PWD/src"
+export MINARI_DATASETS_PATH="$PWD/datasets/minari"
+export HF_HOME="$PWD/cache/huggingface" XDG_CACHE_HOME="$PWD/cache/xdg" TMPDIR="$PWD/cache/tmp"
+mkdir -p "$MINARI_DATASETS_PATH" "$HF_HOME" "$XDG_CACHE_HOME" "$TMPDIR"
+envs/research/bin/python -m dt_corl_delay.download_minari_exact \
+  --dataset mujoco/hopper/medium-v0 --datasets-root "$MINARI_DATASETS_PATH"
+sha256sum datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5
+# 应为 17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84（139555224 字节）
+```
+
+同时把本地保留的 `metadata.json` 和 `download_manifest.json` 一起复制过去，保持 Minari 的目录结构。
+
+### ManiSkill（`scripts/remote/*.sh` 不在公开仓库里，直接用 Python 入口）
+
+```bash
+export MS_ASSET_DIR="$PWD/data/maniskill/assets"
+envs/maniskill/bin/python -m mani_skill.utils.download_demo PickCube-v1 --output_dir "$PWD/data/maniskill/demos"
+envs/maniskill/bin/python -m mani_skill.trajectory.replay_trajectory \
+  --traj-path data/maniskill/demos/PickCube-v1/motionplanning/trajectory.h5 \
   --use-first-env-state -c pd_ee_delta_pos -o state --save-traj -b physx_cpu
+# 把生成的 trajectory.state.pd_ee_delta_pos.physx_cpu.{h5,json} 移到
+# data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/
 # PegInsertionSide 用 -c pd_ee_delta_pose
 ```
 
-- 每个任务 100 条轨迹（与论文一致）。确认后用 `python -m dt_corl_delay.maniskill_dataset_audit` 做审计，并把审计 JSON 放进 `results/revision/P0/`。
-- Diffusion Policy 用 ManiSkill 官方 state baseline，按原配置的超参数重训：obs horizon 2、prediction horizon 16、action horizon 8。
+- 回放参数如果与 ManiSkill 3.0.1（commit `a4a4f92`）的实际 CLI 不一致，以上游为准，并把实际命令写进 PR。
+- 转换结果的摘要要与 `data_index.csv` 的记录比对。不一致时，先查转换设置、轨迹和数据来源；查不清就把这次运行标为“新复现”，并在 T0 中额外比对评测结果。
 
-## 4. 上游代码
+### 上游代码
 
-- DT-CORL：<https://github.com/simonjzh/DT-CORL>，commit `7e44adf934b8aef91ca6fb9e057a1935c6a167c9`，放在 `external/DT-CORL`（加载器会校验 `utils/network.py` 的 SHA-256）。
-- ManiSkill：3.0.1，commit `a4a4f9272ad64b1564035874b605ceb687b63ed8`。
+- `external/ManiSkill-v3.0.1`：完整 Git checkout，commit `a4a4f9272ad64b1564035874b605ceb687b63ed8`。本地备份只有部分文件，**必须重新 checkout**。
+- `external/DT-CORL`：commit `7e44adf934b8aef91ca6fb9e057a1935c6a167c9`。
 
-## 5. 网络 trace
+### 环境
 
-| 文件（相对 trace 根目录） | 来源 | 能否重建 |
-|---|---|---|
-| `5g/pam2025_50ms/atnt/d3/atnt_day_2_d3_rtt.csv` | PAM 2025 公开数据 <https://github.com/NUWiNS/pam2025-multi-carrier-dataset> | 能：下载后用 `python -m dt_corl_delay.network_traces --source-root ... --output-root ...`（默认 50 ms、one-way 0.5、×1/2/4、max delay 32） |
-| `5g/pam2025_50ms/tmobile/d2/tmobile_day_1_d2_rtt.csv` | 同上 | 能 |
-| `5g/pam2025_50ms/verizon/d3/verizon_day_3_d3_rtt.csv` | 同上 | 能 |
-| `wifi/wlan_bound_google_v4_50ms.csv` | **作者本地实测，未公开** | **不确定**：需要作者从本地或备份找回原始数据，再用 `python -m dt_corl_delay.wifi_traces --raw-directory ... --output-file ...` 处理 |
-| `wifi/wlan_gateway_50ms.csv` | 同上 | 同上 |
+沿用交接文档 §5.2 的三套环境：`envs/research`、`envs/maniskill`、`envs/maniskill-dp`。如果服务器 GPU 架构变了，记录实际的 PyTorch/CUDA 版本，写到 `results/revision/P0/env_record.md`。
 
-找不回 WiFi 原始数据的方案（由作者决定）：
-1. 重新实测；
-2. 改用公开 WiFi RTT 数据；
-3. trace 实验只保留 3 个蜂窝来源，并在论文中说明。
+## 4. 路径注意
 
-trace 实验在 P3，不阻塞 P1/P2。
-
-## 6. 需要重训的 checkpoint（P2 范围）
-
-| 任务 | 模型 | seed |
-|---|---|---|
-| Hopper | IQL（`generated_formal_v1_hopper_iql_*` 的超参数）+ CADR 动力学集成 | 101, 102 |
-| PickCube | 官方 DP + CADR 动力学集成 | 101, 102 |
-
-验收：无时延下直接策略的分数与原论文同量级（Hopper medium IQL 的 normalized score 应在常见报告范围内；PickCube DP 在无时延下接近 100% 成功）。偏差很大时先停下来，在 PR 里报告。
+- 历史脚本里写死了 `/root/autodl-tmp/dt-corl-delay`。新服务器上要么沿用这个结构，要么只用 Python 入口，并通过 `DT_CORL_PROJECT_ROOT`、`DT_CORL_DATA_ROOT`、`MINARI_DATASETS_PATH` 指定路径。
+- 新的评测输出一律放在新目录（`runs/recovery_*` 或 `runs/revision_v2_*`），**不要覆盖原归档**。
