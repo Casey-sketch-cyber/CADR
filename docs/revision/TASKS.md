@@ -1,11 +1,11 @@
-# CADR 修订任务说明（给执行 AI：Gemini）
+# CADR 修订任务说明（给执行 AI：当前为 Codex）
 
 > 背景与理由见 [REVIEW_2026-11-19.md](REVIEW_2026-11-19.md)。审核标准见 [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md)。数据重建见 [DATA_RECOVERY.md](DATA_RECOVERY.md)。
 > 执行 AI 实现与跑实验，Claude 负责审核 PR、决定合并。
 
 ## 0. 工作规则（必须遵守）
 
-1. **不要直接推 `main`**。每个任务一个分支、一个 PR，命名 `gemini/T<编号>-<短名>`，例如 `gemini/T1-hazard-posterior`。
+1. **不要直接推 `main`**。每个任务一个分支、一个 PR，命名 `<执行AI>/T<编号>-<短名>`，例如 `codex/T1-hazard-posterior`。
 2. **保留原论文可复现性**：
    - 不修改、不删除 `configs/generated_formal_v1_*`、`configs/generated_ablation_v1_*`；
    - 新实验一律用新系列名 `formal_v2_*` / `ablation_v2_*`；
