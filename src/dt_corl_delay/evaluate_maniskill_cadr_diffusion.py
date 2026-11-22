@@ -99,6 +99,9 @@ def run(
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     device = torch.device(config.get("device", "cuda"))
+    controller_timing_device = (
+        device if config.get("measure_controller_timing", False) else None
+    )
     obs_horizon = int(config.get("obs_horizon", 2))
     act_horizon = int(config.get("act_horizon", 8))
     agent, policy_provenance = load_official_diffusion_agent(
@@ -182,6 +185,7 @@ def run(
             "ack_lag": int(config["ack_lag"]),
             "cvar_alpha": float(config["cvar_alpha"]),
             "environment_config": config["environment"],
+            "controller_timing_device": controller_timing_device,
         }
         if "direct" not in scenario_evaluations:
             scenario_evaluations["direct"] = evaluate_controller(
@@ -272,6 +276,11 @@ def run(
             "device": torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu",
         },
     }
+    if controller_timing_device is not None:
+        summary["controller_timing_context"] = {
+            "max_delay": int(config["max_delay"]),
+            "cadr_ensemble_size": dynamics.ensemble_size,
+        }
     _write_json(summary_path, summary)
     return summary
 

@@ -193,7 +193,17 @@ def evaluate_controller(
     method: str,
     environment_config: Mapping[str, Any] | None = None,
     privileged_selected_age: bool = False,
+    controller_timing_device: torch.device | None = None,
 ) -> dict[str, Any]:
+    """Evaluate a frozen controller and optionally synchronize its step timer."""
+    if controller_timing_device is not None and controller_timing_device.type not in {
+        "cpu",
+        "cuda",
+    }:
+        raise ValueError("controller timing requires a CPU or CUDA device")
+    synchronize_cuda = (
+        controller_timing_device is not None and controller_timing_device.type == "cuda"
+    )
     env = _recover_environment(dataset_id, environment_config)
     returns: list[float] = []
     lengths: list[int] = []
@@ -237,11 +247,15 @@ def evaluate_controller(
                 if setter is None:
                     raise TypeError("privileged age evaluation requires an oracle controller")
                 setter(step - channel_step.selected_packet.generated_step)
+            if synchronize_cuda:
+                torch.cuda.synchronize(controller_timing_device)
             started = time.perf_counter_ns()
             action = controller.act(
                 channel_step.policy_input,
                 decision_step=step,
             )
+            if synchronize_cuda:
+                torch.cuda.synchronize(controller_timing_device)
             inference_times_ms.append((time.perf_counter_ns() - started) / 1e6)
             observation, reward, terminated, truncated, info = env.step(action)
             controller.observe_transition(
@@ -314,6 +328,13 @@ def evaluate_controller(
         "inference_ms_p50": float(np.percentile(latency, 50)),
         "inference_ms_p95": float(np.percentile(latency, 95)),
     }
+    if controller_timing_device is not None:
+        result["controller_timing"] = {
+            "scope": "controller.act",
+            "device": str(controller_timing_device),
+            "cuda_synchronized": synchronize_cuda,
+            "samples": len(inference_times_ms),
+        }
     result.update(
         {
             name: statistics.fmean(values)
