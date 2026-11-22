@@ -123,6 +123,7 @@ class CadrController:
         entropy_gate_threshold: float = 1.4,
         use_content_conditioning: bool = True,
         posterior_updates: bool = True,
+        use_censoring: bool = True,
     ) -> None:
         if not math.isfinite(risk_blend) or risk_blend < 0.0:
             raise ValueError("risk_blend must be finite and non-negative")
@@ -148,6 +149,7 @@ class CadrController:
             memory_steps=memory_steps,
             decay_time=decay_time,
             prior_strength=prior_strength,
+            use_censoring=use_censoring,
         )
         self._actions: list[torch.Tensor] = []
         self._diagnostics: dict[str, list[float]] = {}

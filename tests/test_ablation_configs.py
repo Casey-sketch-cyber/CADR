@@ -28,6 +28,7 @@ class CadrAblationConfigurationTest(unittest.TestCase):
                 "age_decision_rule": "posterior_mean",
                 "use_content_conditioning": False,
             },
+            "no_censoring": {"use_censoring": False},
             "fixed_prior": {"posterior_updates": False},
             "single_model": {"ensemble_size": 1},
             "replan_every_step": {"cadr_act_horizon": 1},
@@ -37,19 +38,18 @@ class CadrAblationConfigurationTest(unittest.TestCase):
             for variant, changed in expectations.items():
                 output = root / f"{variant}.json"
                 config = materialize(template, output, variant)
-                self.assertEqual(config["ablation_variant"], variant)
-                self.assertFalse(config["include_oracle_upper_bound"])
-                self.assertEqual(
-                    config["required_methods"],
-                    [
+                expected_version = "v2" if variant == "no_censoring" else "v1"
+                base_series = source["experiment_series"]
+                expected = source | changed | {
+                    "ablation_variant": variant,
+                    "experiment_series": f"ablation_{expected_version}_{base_series}_{variant}",
+                    "include_oracle_upper_bound": False,
+                    "required_methods": [
                         "official_maniskill_dp_direct_delayed_observation",
                         f"cadr_dp_ablation_{variant}_plus_official_maniskill_dp",
                     ],
-                )
-                self.assertEqual(config["scenarios"], source["scenarios"])
-                self.assertEqual(config["seed"], source["seed"])
-                for key, value in changed.items():
-                    self.assertEqual(config[key], value)
+                }
+                self.assertEqual(config, expected)
                 self.assertEqual(materialize(template, output, variant), config)
 
     def test_replan_ablation_rejects_non_chunked_template(self) -> None:

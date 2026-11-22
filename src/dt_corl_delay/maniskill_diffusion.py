@@ -257,6 +257,7 @@ class CadrDiffusionPolicyController(CadrController):
         age_source: str = "posterior",
         use_content_conditioning: bool = True,
         posterior_updates: bool = True,
+        use_censoring: bool = True,
     ) -> None:
         if age_source not in {"posterior", "oracle"}:
             raise ValueError("age_source must be 'posterior' or 'oracle'")
@@ -276,6 +277,7 @@ class CadrDiffusionPolicyController(CadrController):
             entropy_gate_threshold=entropy_gate_threshold,
             use_content_conditioning=use_content_conditioning,
             posterior_updates=posterior_updates,
+            use_censoring=use_censoring,
         )
         self.device = device
         self.obs_horizon = obs_horizon

@@ -11,6 +11,7 @@ from typing import Any
 SUPPORTED_VARIANTS = {
     "ack_map",
     "no_content",
+    "no_censoring",
     "fixed_prior",
     "single_model",
     "replan_every_step",
@@ -27,7 +28,8 @@ def materialize(
     config = json.loads(template.read_text(encoding="utf-8"))
     config["ablation_variant"] = variant
     base_series = str(config.get("experiment_series", "development"))
-    config["experiment_series"] = f"ablation_v1_{base_series}_{variant}"
+    series = "ablation_v2" if variant == "no_censoring" else "ablation_v1"
+    config["experiment_series"] = f"{series}_{base_series}_{variant}"
     # Ablation runs isolate one deployable CADR component at a time; the
     # privileged upper bound is evaluated only in the frozen main series.
     config["include_oracle_upper_bound"] = False
@@ -42,6 +44,8 @@ def materialize(
     elif variant == "no_content":
         config["age_decision_rule"] = "posterior_mean"
         config["use_content_conditioning"] = False
+    elif variant == "no_censoring":
+        config["use_censoring"] = False
     elif variant == "fixed_prior":
         config["posterior_updates"] = False
     elif variant == "single_model":

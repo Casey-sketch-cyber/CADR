@@ -21,6 +21,7 @@ class CensoredAckDelayEstimator:
     At decision ``t``, a missing ACK for the packet generated at ``g`` implies
     ``delay > t - g - ack_lag``.  An EM update uses that survival information
     rather than incorrectly treating recently missing ACKs as short delays.
+    With ``use_censoring=False``, only revealed delays and the prior contribute.
     """
 
     def __init__(
@@ -32,6 +33,7 @@ class CensoredAckDelayEstimator:
         prior_strength: float = 2.0,
         prior_probabilities: Sequence[float] | None = None,
         em_iterations: int = 8,
+        use_censoring: bool = True,
     ) -> None:
         if max_delay < 0:
             raise ValueError("max_delay must be non-negative")
@@ -50,6 +52,7 @@ class CensoredAckDelayEstimator:
         self.decay_time = decay_time
         self.prior_strength = prior_strength
         self.em_iterations = em_iterations
+        self.use_censoring = use_censoring
         if prior_probabilities is None:
             # A weak short-delay preference makes the cold start usable while
             # retaining non-zero support for every OOD delay in the model.
@@ -98,7 +101,9 @@ class CensoredAckDelayEstimator:
         relevant_steps = range(first_generated, decision_step + 1)
         probabilities = self._probabilities.copy()
         support = np.arange(self.max_delay + 1)
-        for _ in range(self.em_iterations):
+        # Without latent delays, one pass gives the complete weighted counts.
+        iterations = self.em_iterations if self.use_censoring else 1
+        for _ in range(iterations):
             counts = self.prior_strength * self._prior
             for generated_step in relevant_steps:
                 age = decision_step - generated_step
@@ -106,6 +111,8 @@ class CensoredAckDelayEstimator:
                 exact_delay = self._exact_delays.get(generated_step)
                 if exact_delay is not None:
                     counts[exact_delay] += weight
+                    continue
+                if not self.use_censoring:
                     continue
 
                 censoring_threshold = age - self.ack_lag
