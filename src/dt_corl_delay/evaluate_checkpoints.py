@@ -83,6 +83,9 @@ def run(
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     device = torch.device(config.get("device", "cuda"))
+    controller_timing_device = (
+        device if config.get("measure_controller_timing", False) else None
+    )
 
     base_payload = torch.load(base_checkpoint_path, map_location=device, weights_only=False)
     dynamics_payload = torch.load(
@@ -131,6 +134,11 @@ def run(
             "device": torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu",
         },
     }
+    if controller_timing_device is not None:
+        summary["controller_timing_context"] = {
+            "max_delay": int(config["max_delay"]),
+            "cadr_ensemble_size": dynamics.ensemble_size,
+        }
     if partial_path.is_file():
         partial = json.loads(partial_path.read_text(encoding="utf-8"))
         summary["evaluations"] = partial.get("evaluations", {})
@@ -148,6 +156,7 @@ def run(
             ack_lag=int(config["ack_lag"]), cvar_alpha=float(config["cvar_alpha"]),
             method=f"direct_observation_{base_algorithm}",
             environment_config=config.get("environment"),
+            controller_timing_device=controller_timing_device,
         )
         scenario_results: dict[str, Any] = {"direct": direct}
         if include_cadr:
@@ -173,6 +182,7 @@ def run(
                 ack_lag=int(config["ack_lag"]), cvar_alpha=float(config["cvar_alpha"]),
                 method=f"cadr_{base_algorithm}",
                 environment_config=config.get("environment"),
+                controller_timing_device=controller_timing_device,
             )
             scenario_results.update(
                 {
