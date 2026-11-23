@@ -42,6 +42,24 @@ P1 不依赖数据，可以与 P0 并行。T0 不通过（旧配置跑不出旧�
 - 与原 `artifacts/remote/formal_v1_{minari,maniskill}_synthetic/episodes.csv` 中对应任务、seed、方法、场景的逐回合结果比对，写成 `scripts/revision/compare_episodes.py`（输入两个 episodes.csv 和筛选条件，输出逐回合差异、最大绝对差、均值差）。
 - 必须在 P1 代码合入**之前**跑一次，并在合入之后用 legacy 配置再跑一次，证明新代码不改变旧行为。
 
+**2026-11-23 关口修订（Claude 审核 PR #9 后）**
+
+第一次 T0（Colab L4 vs 归档 RTX 5090）的结果：
+- 直接策略 240 回合逐位一致；
+- CADR 只在需要多步动力学 rollout 的场景出现差异，固定时延 1/2、IID、无时延场景都逐位一致；
+- 同一台 L4 上重复运行逐位一致；场景均值差的区间基本覆盖 0。
+
+这符合“跨 GPU 架构的浮点舍入，经多步 rollout 和 Hopper 混沌动力学放大”的特征，不像代码或数据问题。跨硬件逐回合一致因此不再作为通过条件。关口改为以下三条：
+
+1. **T0a 同硬件回归（硬条件）**：P1 合入前后，在同一台机器、同一环境下用 legacy 配置各跑一次，逐回合**逐位一致**。之后所有新旧方法的对比，都必须在同一硬件上新跑 legacy 作为对照，不和归档数字比较。
+2. **T0b 数值敏感性对照（一次性）**：在同一台 L4 上，对 Hopper seed101 的 `drifting_to_long_delay` 和 `markov_switching`（各 20 回合），用 legacy 配置跑两次：
+   - (a) 默认 float32；
+   - (b) 只把 CADR 动力学集成的前向计算改成 float64（仅用于本对照，加配置开关，默认关闭）。
+   用 `compare_episodes.py` 报告 (a) 与 (b) 的逐回合差异。如果差异量级与“归档 vs L4”相当（几十到几百的回报差，且均值差的区间覆盖 0），就确认原因是数值敏感性，T0 通过。如果 (a) 与 (b) 逐位一致或差异极小，说明另有原因，停下来报告。
+3. **跨硬件分布一致（软条件）**：每个场景的均值差在 seed 内的 bootstrap 区间应覆盖 0，或者差值相对场景均值 < 5%；不满足的要单独列出。
+
+PickCube 的固定时延 1 只有 2 个回合成功结果互换、总成功率不变，按同一原则处理。T0b 对 DP 不强制。
+
 ### T1 用风险率后验替换 Eq.(9)/(10)【P1，最高优先级】
 
 **问题**：`controllers.py::_content_conditioned_age_probabilities` 在观测变化时，用 `estimator.effective_age_probabilities()`（无条件 CDF 乘积，对应论文 Eq.9）再截断。它没有用到一条已知信息：生成步 > G_t 的包在 t−1 之前都没有到达。
