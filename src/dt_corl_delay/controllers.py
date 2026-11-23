@@ -16,6 +16,7 @@ from .delay_belief import (
     validate_age_posterior,
 )
 from .dynamics import DeltaDynamicsEnsemble
+from .simple_baselines import SIMPLE_AGE_DECISION_RULES
 
 
 def state_disagreement_components(
@@ -130,16 +131,31 @@ class CadrController:
         use_censoring: bool = True,
         age_posterior: str = "legacy_cdf",
         fixed_prior_probabilities: Sequence[float] | None = None,
+        fixed_horizon: int | None = None,
     ) -> None:
         if not math.isfinite(risk_blend) or risk_blend < 0.0:
             raise ValueError("risk_blend must be finite and non-negative")
         if not math.isfinite(risk_threshold) or risk_threshold < 0.0:
             raise ValueError("risk_threshold must be finite and non-negative")
-        if age_decision_rule not in {"posterior_mean", "map", "entropy_gated"}:
+        supported_rules = {"posterior_mean", "map", "entropy_gated"} | SIMPLE_AGE_DECISION_RULES
+        if age_decision_rule not in supported_rules:
             raise ValueError("unsupported age_decision_rule")
         if entropy_gate_threshold < 0.0:
             raise ValueError("entropy_gate_threshold must be non-negative")
         validate_age_posterior(age_posterior, ack_lag, use_content_conditioning)
+        if max_delay < 0:
+            raise ValueError("max_delay must be non-negative")
+        if age_decision_rule == "in_order_age" and (
+            ack_lag != 1 or not use_content_conditioning
+        ):
+            raise ValueError("in_order_age requires ack_lag=1 and content conditioning")
+        if age_decision_rule == "fixed_horizon_model":
+            if type(fixed_horizon) is not int or not 0 <= fixed_horizon <= max_delay:
+                raise ValueError(
+                    "fixed_horizon_model requires an integer horizon in 0..max_delay"
+                )
+        elif fixed_horizon is not None:
+            raise ValueError("fixed_horizon is only used by fixed_horizon_model")
         self.agent = agent
         self.dynamics = dynamics
         self.state_mean = state_mean
@@ -152,23 +168,36 @@ class CadrController:
         self.posterior_updates = bool(posterior_updates)
         if fixed_prior_probabilities is not None and self.posterior_updates:
             raise ValueError("a fixed delay prior requires posterior_updates=false")
-        self.estimator = CensoredAckDelayEstimator(
-            max_delay=max_delay,
-            ack_lag=ack_lag,
-            memory_steps=memory_steps,
-            decay_time=decay_time,
-            prior_strength=prior_strength,
-            use_censoring=use_censoring,
-            fixed_prior_probabilities=fixed_prior_probabilities,
-        )
+        if fixed_prior_probabilities is not None and age_decision_rule in SIMPLE_AGE_DECISION_RULES:
+            raise ValueError("simple age rules do not use a matched delay prior")
+        self.max_delay = max_delay
+        self.fixed_horizon = fixed_horizon
+        self.estimator = None
+        if age_decision_rule not in SIMPLE_AGE_DECISION_RULES:
+            self.estimator = CensoredAckDelayEstimator(
+                max_delay=max_delay,
+                ack_lag=ack_lag,
+                memory_steps=memory_steps,
+                decay_time=decay_time,
+                prior_strength=prior_strength,
+                use_censoring=use_censoring,
+                fixed_prior_probabilities=fixed_prior_probabilities,
+            )
         self._actions: list[torch.Tensor] = []
         self._diagnostics: dict[str, list[float]] = {}
         self._content_age_posterior = ContentConditionedAgePosterior(max_delay, age_posterior)
+        self._known_selected_generated_step = 0
+        self._previous_observation: np.ndarray | None = None
 
     def reset(self, initial_observation: np.ndarray) -> None:
-        self.estimator.reset()
+        if self.estimator is not None:
+            self.estimator.reset()
         self._actions.clear()
-        self._content_age_posterior.reset(initial_observation)
+        if self.estimator is not None:
+            self._content_age_posterior.reset(initial_observation)
+        if self.age_decision_rule == "in_order_age":
+            self._known_selected_generated_step = 0
+            self._previous_observation = np.asarray(initial_observation).copy()
         self._diagnostics = {
             "posterior_delay_mean": [],
             "effective_age_mean": [],
@@ -184,6 +213,12 @@ class CadrController:
             "map_rule_used": [],
             "reconstruction_reliability": [],
         }
+        if self.estimator is None:
+            del self._diagnostics["posterior_delay_mean"]
+            del self._diagnostics["posterior_entropy"]
+        if self.fixed_horizon is not None:
+            del self._diagnostics["exact_age_from_unchanged_observation"]
+            del self._diagnostics["observation_changed"]
 
     def _content_conditioned_age_probabilities(
         self,
@@ -208,13 +243,47 @@ class CadrController:
             )
         return probabilities
 
+    def _in_order_age(
+        self,
+        policy_input: PolicyInput[np.ndarray],
+        decision_step: int,
+        observation: np.ndarray,
+    ) -> int:
+        for acknowledgement in policy_input.acknowledgements:
+            if acknowledgement.revealed_step > decision_step:
+                raise ValueError("an ACK cannot be used before its reveal step")
+            self._known_selected_generated_step = max(
+                self._known_selected_generated_step,
+                int(acknowledgement.generated_step),
+            )
+        changed = (
+            self._previous_observation is not None
+            and not np.array_equal(observation, self._previous_observation)
+        )
+        generated_step = self._known_selected_generated_step + int(changed)
+        self._previous_observation = observation.copy()
+        self._diagnostics["exact_age_from_unchanged_observation"].append(
+            float(decision_step == 0 or not changed)
+        )
+        self._diagnostics["observation_changed"].append(float(changed))
+        return min(self.max_delay, max(0, decision_step - generated_step))
+
     def _age_decision(
         self,
         policy_input: PolicyInput[np.ndarray],
         decision_step: int,
         raw_observation: np.ndarray,
-        delay_probabilities: np.ndarray,
+        delay_probabilities: np.ndarray | None,
     ) -> tuple[np.ndarray, int, float, bool]:
+        if self.estimator is None:
+            if self.fixed_horizon is not None:
+                age = min(self.fixed_horizon, decision_step, len(self._actions))
+            else:
+                age = self._in_order_age(policy_input, decision_step, raw_observation)
+            probabilities = np.zeros(age + 1, dtype=np.float64)
+            probabilities[age] = 1.0
+            return probabilities, age, 0.0, False
+        assert delay_probabilities is not None
         age_probabilities = self.estimator.effective_age_probabilities(decision_step)
         # Without content, the observation-change constraint on G_t is absent.
         if self.use_content_conditioning:
@@ -239,15 +308,29 @@ class CadrController:
             age_probabilities[selected_age] = 1.0
         return age_probabilities, selected_age, conditioned_age_entropy, use_map
 
+    def _update_delay_statistics(
+        self,
+        policy_input: PolicyInput[np.ndarray],
+        decision_step: int,
+    ) -> np.ndarray | None:
+        if self.estimator is None:
+            return None
+        if self.posterior_updates:
+            return self.estimator.update(decision_step, policy_input.acknowledgements)
+        return self.estimator.probabilities
+
+    def _record_delay_statistics(self, delay_probabilities: np.ndarray | None) -> None:
+        if delay_probabilities is not None:
+            support = np.arange(delay_probabilities.size, dtype=np.float64)
+            self._diagnostics["posterior_delay_mean"].append(
+                float(delay_probabilities @ support)
+            )
+            assert self.estimator is not None
+            self._diagnostics["posterior_entropy"].append(self.estimator.entropy)
+
     @torch.inference_mode()
     def act(self, policy_input: PolicyInput[np.ndarray], decision_step: int) -> np.ndarray:
-        if self.posterior_updates:
-            delay_probabilities = self.estimator.update(
-                decision_step,
-                policy_input.acknowledgements,
-            )
-        else:
-            delay_probabilities = self.estimator.probabilities
+        delay_probabilities = self._update_delay_statistics(policy_input, decision_step)
         raw_observation = np.asarray(policy_input.observation)
         age_probabilities, selected_age, conditioned_age_entropy, use_map = (
             self._age_decision(policy_input, decision_step, raw_observation, delay_probabilities)
@@ -313,11 +396,9 @@ class CadrController:
         action = action.clamp(-1.0, 1.0)
         self._actions.append(action.detach())
 
-        support = np.arange(delay_probabilities.size, dtype=np.float64)
         ages = np.arange(age_probabilities.size, dtype=np.float64)
-        self._diagnostics["posterior_delay_mean"].append(float(delay_probabilities @ support))
+        self._record_delay_statistics(delay_probabilities)
         self._diagnostics["effective_age_mean"].append(float(age_probabilities @ ages))
-        self._diagnostics["posterior_entropy"].append(self.estimator.entropy)
         self._diagnostics["state_disagreement"].append(float(state_disagreement))
         self._diagnostics["epistemic_state_disagreement"].append(
             float(epistemic_state_disagreement)

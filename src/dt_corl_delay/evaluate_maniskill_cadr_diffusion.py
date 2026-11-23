@@ -28,6 +28,7 @@ from .provenance import (
     package_source_provenance,
     verify_package_source_unchanged,
 )
+from .simple_baselines import resolve_simple_baseline
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -56,6 +57,11 @@ def run(
         raise ValueError("choose either the privileged T3 comparator or the legacy oracle")
     if include_oracle and matched_priors:
         raise ValueError("the matched-prior ablation and privileged CADR oracle use separate configs")
+    simple_baseline, fixed_horizons = resolve_simple_baseline(config)
+    if simple_baseline and (include_oracle or include_legacy_oracle):
+        raise ValueError("simple baselines and privileged oracle comparators use separate configs")
+    if simple_baseline and matched_priors:
+        raise ValueError("simple baselines and the matched-prior ablation use separate configs")
     config_snapshot = output_dir / "config.json"
     summary_path = output_dir / "summary.json"
     progress_path = output_dir / "progress.json"
@@ -174,7 +180,7 @@ def run(
     if progress_path.is_file():
         progress = json.loads(progress_path.read_text(encoding="utf-8"))
         evaluations = progress.get("evaluations", {})
-    ablation_variant = config.get("ablation_variant")
+    ablation_variant = simple_baseline or config.get("ablation_variant")
     cadr_method_key = (
         f"cadr_dp_{ablation_variant}" if ablation_variant else "cadr_dp"
     )
@@ -212,6 +218,7 @@ def run(
                 controller_factory=lambda: CadrDiffusionPolicyController(
                     **cadr_controller_arguments,
                     fixed_prior_probabilities=matched_priors.get(scenario_name),
+                    fixed_horizon=fixed_horizons.get(scenario_name),
                 ),
                 method=cadr_method_name,
                 **common_evaluation_arguments,
@@ -306,6 +313,8 @@ def run(
         }
     if include_oracle:
         summary["included_privileged_cadr_oracle_age"] = True
+    if fixed_horizons:
+        summary["fixed_horizon_by_scenario"] = fixed_horizons
     _write_json(summary_path, summary)
     return summary
 
