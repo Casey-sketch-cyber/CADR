@@ -17,6 +17,11 @@ from .controllers import CadrController, DirectObservationController
 from .delayed_eval import evaluate_controller
 from .dynamics import DeltaDynamicsEnsemble
 from .matched_prior import MATCHED_PRIOR_IQL_METHOD, matched_delay_priors
+from .oracle_age_eval import (
+    CADR_ORACLE_AGE_METHOD,
+    OracleAgeCadrController,
+    include_cadr_oracle_age,
+)
 from .provenance import (
     file_input_provenance,
     package_source_provenance,
@@ -45,6 +50,11 @@ def run(
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     matched_priors = matched_delay_priors(config)
+    include_oracle = include_cadr_oracle_age(config)
+    if include_oracle and not include_cadr:
+        raise ValueError("the privileged CADR oracle requires paired CADR evaluation")
+    if include_oracle and matched_priors:
+        raise ValueError("the matched-prior ablation and privileged CADR oracle use separate configs")
     config_snapshot = output_dir / "config.json"
     inputs_snapshot = output_dir / "inputs.json"
     summary_path = output_dir / "summary.json"
@@ -143,6 +153,8 @@ def run(
             "max_delay": int(config["max_delay"]),
             "cadr_ensemble_size": dynamics.ensemble_size,
         }
+    if include_oracle:
+        summary["included_privileged_cadr_oracle_age"] = True
     if partial_path.is_file():
         partial = json.loads(partial_path.read_text(encoding="utf-8"))
         summary["evaluations"] = partial.get("evaluations", {})
@@ -153,42 +165,47 @@ def run(
             continue
         paired_seed = int(config["eval_seed"])
         scenario_started = time.perf_counter()
+        evaluation_arguments = {
+            "dataset_id": config["dataset_id"],
+            "scenario": scenario,
+            "episodes": int(config["eval_episodes"]),
+            "seed": paired_seed,
+            "ack_lag": int(config["ack_lag"]),
+            "cvar_alpha": float(config["cvar_alpha"]),
+            "environment_config": config.get("environment"),
+            "controller_timing_device": controller_timing_device,
+        }
         direct = evaluate_controller(
             controller_factory=lambda: DirectObservationController(agent, state_mean, state_std),
-            dataset_id=config["dataset_id"], scenario=scenario,
-            episodes=int(config["eval_episodes"]), seed=paired_seed,
-            ack_lag=int(config["ack_lag"]), cvar_alpha=float(config["cvar_alpha"]),
             method=f"direct_observation_{base_algorithm}",
-            environment_config=config.get("environment"),
-            controller_timing_device=controller_timing_device,
+            **evaluation_arguments,
         )
         scenario_results: dict[str, Any] = {"direct": direct}
         if include_cadr:
+            cadr_arguments = {
+                "agent": agent,
+                "dynamics": dynamics,
+                "state_mean": state_mean,
+                "state_std": state_std,
+                "max_delay": int(config["max_delay"]),
+                "ack_lag": int(config["ack_lag"]),
+                "memory_steps": int(config["posterior_memory_steps"]),
+                "decay_time": float(config["posterior_decay_time"]),
+                "prior_strength": float(config["posterior_prior_strength"]),
+                "risk_blend": float(config.get("risk_blend", 0.0)),
+                "risk_threshold": float(config.get("risk_threshold", 0.0)),
+                "age_decision_rule": str(config.get("age_decision_rule", "posterior_mean")),
+                "entropy_gate_threshold": float(config.get("entropy_gate_threshold", 1.4)),
+                "use_content_conditioning": bool(config.get("use_content_conditioning", True)),
+                "posterior_updates": bool(config.get("posterior_updates", True)),
+                "use_censoring": bool(config.get("use_censoring", True)),
+                "age_posterior": str(config.get("age_posterior", "legacy_cdf")),
+                "fixed_prior_probabilities": matched_priors.get(scenario_name),
+            }
             cadr = evaluate_controller(
-                controller_factory=lambda: CadrController(
-                    agent=agent, dynamics=dynamics, state_mean=state_mean, state_std=state_std,
-                    max_delay=int(config["max_delay"]), ack_lag=int(config["ack_lag"]),
-                    memory_steps=int(config["posterior_memory_steps"]),
-                    decay_time=float(config["posterior_decay_time"]),
-                    prior_strength=float(config["posterior_prior_strength"]),
-                    risk_blend=float(config.get("risk_blend", 0.0)),
-                    risk_threshold=float(config.get("risk_threshold", 0.0)),
-                    age_decision_rule=str(config.get("age_decision_rule", "posterior_mean")),
-                    entropy_gate_threshold=float(config.get("entropy_gate_threshold", 1.4)),
-                    use_content_conditioning=bool(
-                        config.get("use_content_conditioning", True)
-                    ),
-                    posterior_updates=bool(config.get("posterior_updates", True)),
-                    use_censoring=bool(config.get("use_censoring", True)),
-                    age_posterior=str(config.get("age_posterior", "legacy_cdf")),
-                    fixed_prior_probabilities=matched_priors.get(scenario_name),
-                ),
-                dataset_id=config["dataset_id"], scenario=scenario,
-                episodes=int(config["eval_episodes"]), seed=paired_seed,
-                ack_lag=int(config["ack_lag"]), cvar_alpha=float(config["cvar_alpha"]),
+                controller_factory=lambda: CadrController(**cadr_arguments),
                 method=MATCHED_PRIOR_IQL_METHOD if matched_priors else f"cadr_{base_algorithm}",
-                environment_config=config.get("environment"),
-                controller_timing_device=controller_timing_device,
+                **evaluation_arguments,
             )
             scenario_results.update(
                 {
@@ -198,6 +215,14 @@ def run(
                     ),
                 }
             )
+            if include_oracle:
+                # Only this privileged evaluation receives the selected packet age.
+                scenario_results[CADR_ORACLE_AGE_METHOD] = evaluate_controller(
+                    controller_factory=lambda: OracleAgeCadrController(**cadr_arguments),
+                    method=CADR_ORACLE_AGE_METHOD,
+                    privileged_selected_age=True,
+                    **evaluation_arguments,
+                )
         scenario_results["wall_seconds"] = time.perf_counter() - scenario_started
         summary["evaluations"][scenario_name] = scenario_results
         _write_json_atomic(partial_path, summary)

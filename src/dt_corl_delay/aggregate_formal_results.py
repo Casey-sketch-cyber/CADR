@@ -165,6 +165,11 @@ def _load_rows(run_roots: list[Path], series: str) -> list[dict[str, Any]]:
                                 )
                                 for endpoint, values in secondary_success_arrays.items()
                             },
+                            **(
+                                {"privileged_selected_age": bool(result.get("privileged_selected_age", False))}
+                                if series.startswith(("formal_v2_", "ablation_v2_"))
+                                else {}
+                            ),
                         }
                     )
     deduplicated: dict[tuple[str, int, str, str, int], dict[str, Any]] = {}
@@ -406,6 +411,11 @@ def _aggregate(
             "return_ci95_low": return_low,
             "return_ci95_high": return_high,
         }
+        if "privileged_selected_age" in group[0]:
+            flags = {row["privileged_selected_age"] for row in group}
+            if len(flags) != 1:
+                raise ValueError(f"mixed privilege flags for {task}/{scenario}/{method}")
+            result["privileged_selected_age"] = flags.pop()
         if success_by_seed:
             successes = np.asarray(
                 [value for values in success_by_seed.values() for value in values],

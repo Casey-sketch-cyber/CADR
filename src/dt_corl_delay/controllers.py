@@ -208,17 +208,14 @@ class CadrController:
             )
         return probabilities
 
-    @torch.inference_mode()
-    def act(self, policy_input: PolicyInput[np.ndarray], decision_step: int) -> np.ndarray:
-        if self.posterior_updates:
-            delay_probabilities = self.estimator.update(
-                decision_step,
-                policy_input.acknowledgements,
-            )
-        else:
-            delay_probabilities = self.estimator.probabilities
+    def _age_decision(
+        self,
+        policy_input: PolicyInput[np.ndarray],
+        decision_step: int,
+        raw_observation: np.ndarray,
+        delay_probabilities: np.ndarray,
+    ) -> tuple[np.ndarray, int, float, bool]:
         age_probabilities = self.estimator.effective_age_probabilities(decision_step)
-        raw_observation = np.asarray(policy_input.observation)
         # Without content, the observation-change constraint on G_t is absent.
         if self.use_content_conditioning:
             age_probabilities = self._content_conditioned_age_probabilities(
@@ -240,6 +237,21 @@ class CadrController:
         if use_map:
             age_probabilities = np.zeros_like(age_probabilities)
             age_probabilities[selected_age] = 1.0
+        return age_probabilities, selected_age, conditioned_age_entropy, use_map
+
+    @torch.inference_mode()
+    def act(self, policy_input: PolicyInput[np.ndarray], decision_step: int) -> np.ndarray:
+        if self.posterior_updates:
+            delay_probabilities = self.estimator.update(
+                decision_step,
+                policy_input.acknowledgements,
+            )
+        else:
+            delay_probabilities = self.estimator.probabilities
+        raw_observation = np.asarray(policy_input.observation)
+        age_probabilities, selected_age, conditioned_age_entropy, use_map = (
+            self._age_decision(policy_input, decision_step, raw_observation, delay_probabilities)
+        )
         observation = torch.as_tensor(
             raw_observation,
             dtype=torch.float32,

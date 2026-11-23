@@ -261,8 +261,8 @@ class CadrDiffusionPolicyController(CadrController):
         age_posterior: str = "legacy_cdf",
         fixed_prior_probabilities: Sequence[float] | None = None,
     ) -> None:
-        if age_source not in {"posterior", "oracle"}:
-            raise ValueError("age_source must be 'posterior' or 'oracle'")
+        if age_source not in {"posterior", "oracle", "cadr_oracle_age"}:
+            raise ValueError("unsupported age_source")
         super().__init__(
             agent=agent,
             dynamics=dynamics,
@@ -297,11 +297,11 @@ class CadrDiffusionPolicyController(CadrController):
         self._oracle_age = None
 
     def set_oracle_age(self, age: int) -> None:
-        """Supply evaluator-only packet age for the privileged upper bound."""
+        """Supply evaluator-only packet age for the privileged comparator."""
 
-        if self.age_source != "oracle":
+        if self.age_source == "posterior":
             raise RuntimeError("oracle age can only be set for an oracle controller")
-        if age < 0 or age > self.estimator.max_delay:
+        if age < 0 or (self.age_source == "oracle" and age > self.estimator.max_delay):
             raise ValueError("oracle age is outside the configured delay support")
         self._oracle_age = int(age)
 
@@ -317,6 +317,7 @@ class CadrDiffusionPolicyController(CadrController):
         self._last_decision_step = -1
         self._replans = 0
         self._executed_actions = 0
+        self._oracle_age = None
 
     @torch.inference_mode()
     def act(self, policy_input: PolicyInput[np.ndarray], decision_step: int) -> np.ndarray:
@@ -331,11 +332,15 @@ class CadrDiffusionPolicyController(CadrController):
         else:
             delay_probabilities = self.estimator.probabilities
         raw_observation = np.asarray(policy_input.observation, dtype=np.float32)
-        if self.age_source == "oracle":
+        if self.age_source != "posterior":
             if self._oracle_age is None:
                 raise RuntimeError("set_oracle_age must be called before every action")
             selected_age = self._oracle_age
             self._oracle_age = None
+            if self.age_source == "cadr_oracle_age" and (
+                selected_age > decision_step or selected_age > len(self._actions)
+            ):
+                raise ValueError("oracle age exceeds the executed action history")
             age_probabilities = np.zeros(selected_age + 1, dtype=np.float64)
             age_probabilities[selected_age] = 1.0
             conditioned_age_entropy = 0.0
@@ -403,7 +408,9 @@ class CadrDiffusionPolicyController(CadrController):
                 age_weights,
             )
             reliability = 1.0
-            if self.age_source == "posterior" and self.risk_blend > 0.0:
+            # Preserve the legacy v1 oracle's risk behavior. T3 changes only
+            # the age distribution relative to the ordinary CADR-DP path.
+            if self.age_source != "oracle" and self.risk_blend > 0.0:
                 reliability = reconstruction_reliability(
                     float(state_disagreement),
                     self.risk_blend,
