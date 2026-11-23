@@ -166,6 +166,7 @@ def run(
                         config.get("use_content_conditioning", True)
                     ),
                     posterior_updates=bool(config.get("posterior_updates", True)),
+                    use_censoring=bool(config.get("use_censoring", True)),
                 ),
                 dataset_id=config["dataset_id"], scenario=scenario,
                 episodes=int(config["eval_episodes"]), seed=paired_seed,

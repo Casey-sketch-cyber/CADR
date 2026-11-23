@@ -155,6 +155,7 @@ def run(
             config.get("use_content_conditioning", True)
         ),
         "posterior_updates": bool(config.get("posterior_updates", True)),
+        "use_censoring": bool(config.get("use_censoring", True)),
     }
     evaluations: dict[str, dict[str, Any]] = {}
     if progress_path.is_file():
