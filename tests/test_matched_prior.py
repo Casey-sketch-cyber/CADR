@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -105,3 +106,93 @@ def test_materialized_variants_keep_frozen_scenarios(tmp_path, config_name, meth
     )
     with pytest.raises(ValueError, match="requires posterior_updates=false"):
         matched_delay_priors({**matched, "posterior_updates": True})
+
+
+@pytest.mark.parametrize("policy", ["iql", "dp"])
+def test_matched_prior_hazard_completes_changepoint_rollout(monkeypatch, policy):
+    torch = pytest.importorskip("torch")
+    from dt_corl_delay import delayed_eval
+    from dt_corl_delay.controllers import CadrController
+
+    scenario = {
+        "name": "short_downward_changepoint",
+        "type": "changepoint",
+        "before": {"delays": [3], "probabilities": [1.0]},
+        "after": {"delays": [0], "probabilities": [1.0]},
+        "change_step": 3,
+    }
+    config = {
+        "ablation_variant": "fixed_prior_matched",
+        "age_posterior": "hazard",
+        "posterior_updates": False,
+        "max_delay": 4,
+        "scenarios": [scenario],
+    }
+    prior = matched_delay_priors(config)[scenario["name"]]
+    horizon = 8
+
+    class ShortEpisode:
+        spec = SimpleNamespace(max_episode_steps=horizon)
+
+        def reset(self, *, seed):
+            self.steps = 0
+            return np.array([0.0], dtype=np.float32), {}
+
+        def step(self, action):
+            assert np.isfinite(action).all()
+            self.steps += 1
+            observation = np.array([self.steps], dtype=np.float32)
+            return observation, 1.0, self.steps == horizon, False, {}
+
+        def close(self):
+            assert self.steps == horizon
+
+    monkeypatch.setattr(delayed_eval, "_recover_environment", lambda *_: ShortEpisode())
+    device = torch.device("cpu")
+    agent = SimpleNamespace(
+        device=device,
+        act_normalized=lambda state: state * 0.01,
+        get_action=lambda observations: observations.new_zeros((1, 8, 1)),
+    )
+    dynamics = SimpleNamespace(
+        rollout_age_candidates=lambda state, actions, maximum_age: (
+            state.unsqueeze(0).expand(maximum_age + 1, -1, -1)
+        ),
+        state_dim=1,
+        ensemble_size=1,
+    )
+    controller_options = {
+        "agent": agent,
+        "dynamics": dynamics,
+        "state_mean": torch.zeros(1, 1),
+        "state_std": torch.ones(1, 1),
+        "max_delay": config["max_delay"],
+        "ack_lag": 1,
+        "posterior_updates": config["posterior_updates"],
+        "fixed_prior_probabilities": prior,
+        "age_posterior": config["age_posterior"],
+    }
+    if policy == "dp":
+        pytest.importorskip("h5py")
+        from dt_corl_delay.maniskill_diffusion import CadrDiffusionPolicyController
+
+        controller = CadrDiffusionPolicyController(device=device, **controller_options)
+    else:
+        controller = CadrController(**controller_options)
+    result = delayed_eval.evaluate_controller(
+        controller_factory=lambda: controller,
+        dataset_id="synthetic/test",
+        scenario=scenario,
+        episodes=1,
+        seed=101,
+        ack_lag=1,
+        cvar_alpha=1.0,
+        method=f"fixed_prior_matched_{policy}",
+    )
+    assert result["episode_lengths"] == [horizon]
+    assert result["returns"] == [float(horizon)]
+    assert result["generated_delay_histogram"] == {"0": 6, "3": 2}
+    # At step 3, the first immediate arrival bounds the age by K=2, below
+    # the prior's only supported delay (3). The rollout needs the fallback.
+    assert result["mean_hazard_zero_mass_fallback"] > 0.0
+    np.testing.assert_array_equal(controller.estimator.probabilities, prior)
