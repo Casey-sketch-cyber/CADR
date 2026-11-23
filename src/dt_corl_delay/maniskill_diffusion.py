@@ -258,6 +258,7 @@ class CadrDiffusionPolicyController(CadrController):
         use_content_conditioning: bool = True,
         posterior_updates: bool = True,
         use_censoring: bool = True,
+        age_posterior: str = "legacy_cdf",
     ) -> None:
         if age_source not in {"posterior", "oracle"}:
             raise ValueError("age_source must be 'posterior' or 'oracle'")
@@ -278,6 +279,7 @@ class CadrDiffusionPolicyController(CadrController):
             use_content_conditioning=use_content_conditioning,
             posterior_updates=posterior_updates,
             use_censoring=use_censoring,
+            age_posterior=age_posterior,
         )
         self.device = device
         self.obs_horizon = obs_horizon
@@ -338,12 +340,14 @@ class CadrDiffusionPolicyController(CadrController):
             use_map = True
         else:
             age_probabilities = self.estimator.effective_age_probabilities(decision_step)
+            # Without content, retain the unconditional CDF posterior.
             if self.use_content_conditioning:
                 age_probabilities = self._content_conditioned_age_probabilities(
                     raw_observation,
                     decision_step,
                     age_probabilities,
                     policy_input,
+                    delay_probabilities,
                 )
             selected_age = int(np.argmax(age_probabilities))
             positive_probabilities = age_probabilities[age_probabilities > 0.0]

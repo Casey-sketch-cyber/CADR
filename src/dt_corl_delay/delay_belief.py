@@ -15,6 +15,124 @@ import numpy as np
 from .channel import Ack
 
 
+def hazard_age_probabilities(
+    delay_probabilities: np.ndarray, maximum_age: int
+) -> np.ndarray:
+    """Return the age posterior given an observation change and an age bound.
+
+    If newer packets had not arrived before this step, each can arrive now
+    with discrete hazard q(k) / P(delay >= k). The freshest of those arrivals
+    determines the age. Condition its probabilities on an arrival by age K.
+    """
+    q = np.asarray(delay_probabilities, dtype=np.float64)
+    if q.ndim != 1 or q.size == 0 or not np.isfinite(q).all() or np.any(q < 0.0):
+        raise ValueError("delay_probabilities must be a finite, non-negative vector")
+    if not 0 <= maximum_age < q.size:
+        raise ValueError("maximum_age is outside the delay support")
+    if not np.any(q > 0.0):
+        raise ValueError("delay_probabilities must have positive mass")
+    if maximum_age == 0:
+        # A change with only one feasible age determines that age.
+        return np.asarray([1.0], dtype=np.float64)
+
+    q = q / q.max()
+    survival = np.cumsum(q[::-1])[::-1][: maximum_age + 1]
+    weights = np.divide(
+        q[: maximum_age + 1],
+        survival,
+        out=np.ones_like(survival),
+        where=survival > 0.0,
+    )
+    # S(k+1)/S(k) is 1 - h(k) and avoids cancellation for hazards near one.
+    not_arrived = np.divide(
+        survival[1:],
+        survival[:-1],
+        out=np.zeros_like(survival[:-1]),
+        where=survival[:-1] > 0.0,
+    )
+    weights[1:] *= np.cumprod(not_arrived)
+    mass = float(weights.sum())
+    if mass == 0.0:
+        raise ValueError("no positive delay mass at a feasible changed-observation age")
+    return weights / mass
+
+
+def validate_age_posterior(
+    age_posterior: str, ack_lag: int, use_content_conditioning: bool
+) -> None:
+    if age_posterior not in {"legacy_cdf", "hazard"}:
+        raise ValueError("age_posterior must be 'legacy_cdf' or 'hazard'")
+    if age_posterior == "hazard" and use_content_conditioning and ack_lag != 1:
+        raise ValueError("the content-conditioned hazard posterior requires ack_lag=1")
+
+
+class ContentConditionedAgePosterior:
+    """Track the ACK and observation history shared by CADR and hazard DT-ACK."""
+
+    def __init__(self, max_delay: int, age_posterior: str) -> None:
+        self.max_delay = max_delay
+        self.age_posterior = age_posterior
+        self._known_selected_generated_step = 0
+        self._previous_observation: np.ndarray | None = None
+
+    def reset(self, initial_observation: np.ndarray) -> None:
+        self._known_selected_generated_step = 0
+        self._previous_observation = np.asarray(initial_observation).copy()
+
+    def probabilities(
+        self,
+        observation: np.ndarray,
+        decision_step: int,
+        acknowledgements: Sequence[Ack],
+        base_probabilities: np.ndarray,
+        delay_probabilities: np.ndarray,
+    ) -> tuple[np.ndarray, bool, bool]:
+        for acknowledgement in acknowledgements:
+            self._known_selected_generated_step = max(
+                self._known_selected_generated_step,
+                int(acknowledgement.generated_step),
+            )
+        changed = (
+            self._previous_observation is not None
+            and not np.array_equal(observation, self._previous_observation)
+        )
+        exact_age = False
+        if decision_step == 0:
+            probabilities = np.asarray([1.0], dtype=np.float64)
+            exact_age = True
+        elif not changed:
+            age = min(
+                self.max_delay,
+                max(0, decision_step - self._known_selected_generated_step),
+            )
+            probabilities = np.zeros(age + 1, dtype=np.float64)
+            probabilities[age] = 1.0
+            exact_age = True
+        else:
+            # A changed observation is newer than the latest revealed packet.
+            maximum_possible_age = min(
+                len(base_probabilities) - 1,
+                max(0, decision_step - self._known_selected_generated_step - 1),
+            )
+            if self.age_posterior == "hazard":
+                probabilities = hazard_age_probabilities(
+                    delay_probabilities, maximum_possible_age
+                )
+            else:
+                probabilities = base_probabilities[: maximum_possible_age + 1].copy()
+                mass = float(probabilities.sum())
+                if mass <= 1e-15:
+                    probabilities = np.full(
+                        maximum_possible_age + 1,
+                        1.0 / (maximum_possible_age + 1),
+                        dtype=np.float64,
+                    )
+                else:
+                    probabilities /= mass
+        self._previous_observation = observation.copy()
+        return probabilities, exact_age, changed
+
+
 class CensoredAckDelayEstimator:
     """Exponentially weighted discrete delay estimator with censoring.
 

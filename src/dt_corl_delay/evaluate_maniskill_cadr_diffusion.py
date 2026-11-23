@@ -159,6 +159,7 @@ def run(
         ),
         "posterior_updates": bool(config.get("posterior_updates", True)),
         "use_censoring": bool(config.get("use_censoring", True)),
+        "age_posterior": str(config.get("age_posterior", "legacy_cdf")),
     }
     evaluations: dict[str, dict[str, Any]] = {}
     if progress_path.is_file():
