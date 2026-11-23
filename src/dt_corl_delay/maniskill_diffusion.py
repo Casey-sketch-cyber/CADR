@@ -10,7 +10,7 @@ from pathlib import Path
 import subprocess
 import sys
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Sequence
 
 import h5py
 import numpy as np
@@ -259,6 +259,7 @@ class CadrDiffusionPolicyController(CadrController):
         posterior_updates: bool = True,
         use_censoring: bool = True,
         age_posterior: str = "legacy_cdf",
+        fixed_prior_probabilities: Sequence[float] | None = None,
     ) -> None:
         if age_source not in {"posterior", "oracle"}:
             raise ValueError("age_source must be 'posterior' or 'oracle'")
@@ -280,6 +281,7 @@ class CadrDiffusionPolicyController(CadrController):
             posterior_updates=posterior_updates,
             use_censoring=use_censoring,
             age_posterior=age_posterior,
+            fixed_prior_probabilities=fixed_prior_probabilities,
         )
         self.device = device
         self.obs_horizon = obs_horizon

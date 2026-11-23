@@ -7,12 +7,19 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .matched_prior import (
+    MATCHED_PRIOR_IQL_METHOD,
+    MATCHED_PRIOR_VARIANT,
+    matched_delay_priors,
+)
+
 
 SUPPORTED_VARIANTS = {
     "ack_map",
     "no_content",
     "no_censoring",
     "fixed_prior",
+    MATCHED_PRIOR_VARIANT,
     "single_model",
     "replan_every_step",
 }
@@ -28,7 +35,11 @@ def materialize(
     config = json.loads(template.read_text(encoding="utf-8"))
     config["ablation_variant"] = variant
     base_series = str(config.get("experiment_series", "development"))
-    series = "ablation_v2" if variant == "no_censoring" else "ablation_v1"
+    series = (
+        "ablation_v2"
+        if variant in {"no_censoring", MATCHED_PRIOR_VARIANT}
+        else "ablation_v1"
+    )
     config["experiment_series"] = f"{series}_{base_series}_{variant}"
     # Ablation runs isolate one deployable CADR component at a time; the
     # privileged upper bound is evaluated only in the frozen main series.
@@ -48,6 +59,11 @@ def materialize(
         config["use_censoring"] = False
     elif variant == "fixed_prior":
         config["posterior_updates"] = False
+    elif variant == MATCHED_PRIOR_VARIANT:
+        config["posterior_updates"] = False
+        matched_delay_priors(config)
+        if "act_horizon" not in config:
+            config["required_methods"] = ["direct_observation_iql", MATCHED_PRIOR_IQL_METHOD]
     elif variant == "single_model":
         config["ensemble_size"] = 1
     elif variant == "replan_every_step":
