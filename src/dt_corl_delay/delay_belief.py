@@ -23,7 +23,18 @@ def hazard_age_probabilities(
     If newer packets had not arrived before this step, each can arrive now
     with discrete hazard q(k) / P(delay >= k). The freshest of those arrivals
     determines the age. Condition its probabilities on an arrival by age K.
+    The survival factors telescope, so the normalized result is q restricted
+    to feasible ages. If q has no mass there, return a uniform distribution.
     """
+    probabilities, _ = _hazard_age_probabilities_with_fallback(
+        delay_probabilities, maximum_age
+    )
+    return probabilities
+
+
+def _hazard_age_probabilities_with_fallback(
+    delay_probabilities: np.ndarray, maximum_age: int
+) -> tuple[np.ndarray, bool]:
     q = np.asarray(delay_probabilities, dtype=np.float64)
     if q.ndim != 1 or q.size == 0 or not np.isfinite(q).all() or np.any(q < 0.0):
         raise ValueError("delay_probabilities must be a finite, non-negative vector")
@@ -31,9 +42,11 @@ def hazard_age_probabilities(
         raise ValueError("maximum_age is outside the delay support")
     if not np.any(q > 0.0):
         raise ValueError("delay_probabilities must have positive mass")
+    if not np.any(q[: maximum_age + 1] > 0.0):
+        return np.full(maximum_age + 1, 1.0 / (maximum_age + 1)), True
     if maximum_age == 0:
         # A change with only one feasible age determines that age.
-        return np.asarray([1.0], dtype=np.float64)
+        return np.asarray([1.0], dtype=np.float64), False
 
     q = q / q.max()
     survival = np.cumsum(q[::-1])[::-1][: maximum_age + 1]
@@ -53,8 +66,12 @@ def hazard_age_probabilities(
     weights[1:] *= np.cumprod(not_arrived)
     mass = float(weights.sum())
     if mass == 0.0:
-        raise ValueError("no positive delay mass at a feasible changed-observation age")
-    return weights / mass
+        # The full-law rescaling can underflow when feasible positive mass
+        # is tiny compared to tail mass. Normalize the feasible law directly.
+        feasible = np.asarray(delay_probabilities, dtype=np.float64)[: maximum_age + 1]
+        feasible = feasible / feasible.max()
+        return feasible / feasible.sum(), False
+    return weights / mass, False
 
 
 def validate_age_posterior(
@@ -74,10 +91,12 @@ class ContentConditionedAgePosterior:
         self.age_posterior = age_posterior
         self._known_selected_generated_step = 0
         self._previous_observation: np.ndarray | None = None
+        self.hazard_zero_mass_fallback = False
 
     def reset(self, initial_observation: np.ndarray) -> None:
         self._known_selected_generated_step = 0
         self._previous_observation = np.asarray(initial_observation).copy()
+        self.hazard_zero_mass_fallback = False
 
     def probabilities(
         self,
@@ -87,6 +106,7 @@ class ContentConditionedAgePosterior:
         base_probabilities: np.ndarray,
         delay_probabilities: np.ndarray,
     ) -> tuple[np.ndarray, bool, bool]:
+        self.hazard_zero_mass_fallback = False
         for acknowledgement in acknowledgements:
             self._known_selected_generated_step = max(
                 self._known_selected_generated_step,
@@ -115,8 +135,10 @@ class ContentConditionedAgePosterior:
                 max(0, decision_step - self._known_selected_generated_step - 1),
             )
             if self.age_posterior == "hazard":
-                probabilities = hazard_age_probabilities(
-                    delay_probabilities, maximum_possible_age
+                probabilities, self.hazard_zero_mass_fallback = (
+                    _hazard_age_probabilities_with_fallback(
+                        delay_probabilities, maximum_possible_age
+                    )
                 )
             else:
                 probabilities = base_probabilities[: maximum_possible_age + 1].copy()

@@ -37,6 +37,32 @@ def test_tiny_survival_mass_is_preserved() -> None:
     np.testing.assert_allclose(hazard_age_probabilities(q, 2), q, atol=0, rtol=1e-15)
 
 
+def test_hazard_uses_uniform_fallback_only_for_zero_feasible_mass() -> None:
+    q = np.array([0.0, 0.0, 0.0, 1.0])
+    np.testing.assert_array_equal(hazard_age_probabilities(q, 2), [1 / 3] * 3)
+    np.testing.assert_array_equal(hazard_age_probabilities(q, 3), q)
+    with pytest.raises(ValueError, match="positive mass"):
+        hazard_age_probabilities(np.zeros_like(q), 2)
+
+
+def test_hazard_fallback_diagnostic_is_per_decision() -> None:
+    q = np.array([0.0, 0.0, 0.0, 1.0])
+    history = ContentConditionedAgePosterior(3, "hazard")
+    initial = np.array([0.0])
+    changed_observation = np.array([1.0])
+    history.reset(initial)
+    posterior, exact, changed = history.probabilities(
+        changed_observation, 3, (), q, q
+    )
+    np.testing.assert_array_equal(posterior, [1 / 3] * 3)
+    assert changed and not exact and history.hazard_zero_mass_fallback
+    posterior, exact, changed = history.probabilities(
+        changed_observation, 4, (), q, q
+    )
+    np.testing.assert_array_equal(posterior, q)
+    assert exact and not changed and not history.hazard_zero_mass_fallback
+
+
 def test_hazard_rejects_unsupported_ack_lag_only_when_conditioning() -> None:
     with pytest.raises(ValueError, match="requires ack_lag=1"):
         validate_age_posterior("hazard", 2, True)

@@ -198,6 +198,10 @@ class CadrController:
         )
         self._diagnostics["exact_age_from_unchanged_observation"].append(float(exact_age))
         self._diagnostics["observation_changed"].append(float(changed))
+        if self._content_age_posterior.age_posterior == "hazard":
+            self._diagnostics.setdefault("hazard_zero_mass_fallback", []).append(
+                float(self._content_age_posterior.hazard_zero_mass_fallback)
+            )
         return probabilities
 
     @torch.inference_mode()

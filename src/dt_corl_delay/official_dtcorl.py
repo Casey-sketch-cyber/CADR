@@ -201,6 +201,9 @@ class OfficialDTCorlAckMapController:
                     age_probabilities,
                     delay_probabilities,
                 )
+                self._diagnostics.setdefault("hazard_zero_mass_fallback", []).append(
+                    float(self._content_age_posterior.hazard_zero_mass_fallback)
+                )
             selected_age = int(np.argmax(age_probabilities))
         age = min(selected_age, self.maximum_delay, len(self._actions), len(self._rewards))
         observation = torch.as_tensor(
