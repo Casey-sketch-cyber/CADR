@@ -5,8 +5,10 @@
 | 任务 | 训练 seed | 场景 × 方法 × 每组回合数 | 已配对 | 最大绝对回报差 | 状态 |
 | --- | ---: | --- | ---: | ---: | --- |
 | Hopper · IQL | 101 | 12 × 2 × 20 | 480/480 | 0 | 逐位一致 |
-| PickCube · Diffusion Policy | 101 | 9 × 3 × 20 | 80/540 | 0 | 已比较部分逐位一致，评测继续 |
+| PickCube · Diffusion Policy | 101 | 9 × 3 × 20 | 540/540 | 0 | 逐位一致 |
 
-运行使用原始评测入口和完整场景配置。首先用 `compare_episodes.py` 按任务、训练 seed、场景、方法、回合编号及回合 seed 配对。另核对回报的浮点位模式、回合长度、已记录的成功指标和变点恢复步数。计时与采样环境元数据单独记录。Hopper 的两个方法均完成全部 12 个场景，见 [场景汇总](hopper_aggregate.json)。
+运行使用原始评测入口和完整场景配置。首先用 `compare_episodes.py` 按任务、训练 seed、场景、方法、回合编号及回合 seed 配对。另核对回报的浮点位模式、回合长度、已记录的成功指标和变点恢复步数。两个任务的全部 1,020 个配对回合均吻合，最大绝对回报差为 0。计时与运行时元数据单独记录。逐场景汇总见 [Hopper](hopper_aggregate.json) 和 [PickCube](pickcube_aggregate.json)。
 
-T0a 总关口待 PickCube 完整结果。P2 同时等待 [T6 设计](https://github.com/Casey-sketch-cyber/CADR/pull/13)审核。
+PickCube 两组各完成 400 个回合后，在 `markov_switching` 的 oracle 仿真环境初始化时收到 CPython `gilstate_tss_set` 原生错误并中止。保存已有进度后，在同一 Colab 会话和同一张 T4 上以原入口的 `--resume` 完成剩余回合。续跑沿用原配置、输入和评测种子；按同样的完整覆盖与逐位标准检查。
+
+T0a 达到审核规定的逐回合一致性标准。P2 等待 [T6 设计](https://github.com/Casey-sketch-cyber/CADR/pull/13)审核。

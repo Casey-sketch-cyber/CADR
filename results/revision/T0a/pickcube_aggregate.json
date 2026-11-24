@@ -1,0 +1,479 @@
+{
+  "task": "pickcube",
+  "expected_episodes_per_arm": 540,
+  "completed_episodes_pre_and_post": [
+    540,
+    540
+  ],
+  "paired": 540,
+  "groups_with_differences": [],
+  "passed": true,
+  "canonical_comparator": {
+    "passed": true,
+    "reference_count": 540,
+    "candidate_count": 540,
+    "paired_count": 540,
+    "missing_count": 0,
+    "extra_count": 0,
+    "missing_from_candidate": [],
+    "extra_in_candidate": [],
+    "return_abs_tol": 0,
+    "return_rel_tol": 0,
+    "return_nonzero_deltas": 0,
+    "return_mismatches": 0,
+    "return_max_abs_delta": 0,
+    "return_mean_delta": 0,
+    "success_pairs_with_values": 540,
+    "success_mismatches": 0
+  },
+  "groups": [
+    {
+      "scenario": "clean_delay_0",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "clean_delay_0",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "clean_delay_0",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_1",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_1",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_1",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_2",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_2",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_2",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_4",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_4",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_4",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_8",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_8",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_8",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "iid_in_distribution",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "iid_in_distribution",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "iid_in_distribution",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "ood_changepoint",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0,
+        "post_change_success_occupancies": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "ood_changepoint",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0,
+        "post_change_success_occupancies": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "ood_changepoint",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0,
+        "post_change_success_occupancies": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "ood_drifting",
+      "method": "cadr_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "ood_drifting",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    },
+    {
+      "scenario": "ood_drifting",
+      "method": "oracle_dp",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "successes": 0,
+        "successes_once": 0,
+        "successes_at_end": 0,
+        "success_occupancies": 0
+      }
+    }
+  ],
+  "environment": {
+    "phase": "evaluated",
+    "started_at": 1795504062.7589083,
+    "commits": {
+      "pre": "33d104e08fe739790672f3c14dc123ff0f4199f1",
+      "post": "41e9ca605be887b2cfa71dd6a46191d392e838f8"
+    },
+    "config_sha256": "2894dc4080aa9836ac5f91fbe756efd198c64640aa18c071d96d469bc5264c79",
+    "inputs_sha256": {
+      "runs/formal_v1_dp_pickcube_seed101/checkpoints/best_eval_success_once.pt": "713ff18c9dcfac416350fd77c9a636cdfa70001780d3a00f3e6b5e7a1ad6a527",
+      "runs/formal_v1_dp_dynamics_pickcube_seed101/dynamics_checkpoint.pt": "0e15a34cb24e1c69321029fe02ef0b82c29829dc24b2ace877c1132e2dae5820",
+      "data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.h5": "2532b37a4086e8fce9ec18781f38b2552bba5bf146e6b83e96d293905812c59c",
+      "data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.json": "8b7d4d78715aac218eb50c5d1584c21501959b756b2a6dc896a1ea1f3e8df167"
+    },
+    "gpu": {
+      "name": "Tesla T4",
+      "memory_mib": 15360,
+      "driver": "580.82.07"
+    },
+    "arms": {
+      "pre": {
+        "runtime": {
+          "cuda": "12.8",
+          "device": "Tesla T4",
+          "torch": "2.8.0+cu128"
+        }
+      },
+      "post": {
+        "runtime": {
+          "cuda": "12.8",
+          "device": "Tesla T4",
+          "torch": "2.8.0+cu128"
+        }
+      }
+    },
+    "ended_at": 1795505949.185312
+  }
+}
