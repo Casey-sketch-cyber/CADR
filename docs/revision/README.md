@@ -20,9 +20,18 @@
   - T0b（#11）：同一张卡上只改动力学精度，差异量级与跨 GPU 时相当，确认是数值敏感性；
   - T0a（#14）：同一张 T4、同一会话，P1 合入前后 legacy 配置 1020/1020 回合逐位一致（Hopper 480，PickCube 540）
 - [x] T6 设计（#13）已合并，**有条件批准**，修改见下方
-- [ ] T6-runner 代码 PR → P2a 快速验证 → **决策关口**
+- [x] T6-runner（#16）已合并：单方法入口、state_mean、ensemble_members、批量运行器、汇总脚本。已在 T4 上验证与旧入口逐位等价（24/24），无时延自检通过
+- [ ] **P2a 快速验证（可以开跑）** → 决策关口
 - [ ] P3 完整矩阵、trace 与其余消融
 - [ ] P4 论文重写
+
+## 执行 AI 当前待办（Claude 2026-11-24 傍晚审核结论，优先于下一节）
+
+1. **P2a 可以开跑**，按 `results/revision/T6/p2a_plan.json` 的 7 个批次执行。决策只认 Hopper 5 个 seed 的结果，**这 5 个批次必须用同一类 GPU**，否则汇总脚本会判为数据不足。
+2. **开跑的同时交一个小 PR `codex/T6-followups`**（不影响运行，但要在生成决策报告前合并）：
+   - `assess_decision` 中“新后验不比旧后验显著差”这一条，`route_a_criteria_met` 要按**全部 12 个场景**判断，与 §D 的预注册一致；当前只检查了 4 个重点场景。
+   - 把 `docs/revision/handoff/data_index.csv` 中 Hopper `metadata.json` 那一行恢复成交接原样。补算的 SHA-256 放到单独的补充索引（如 `docs/revision/handoff/supplemental_hashes.csv`），注明计算日期、来源文件和计算方式，`prepare_t6.py` 同时读取两份。交接文件是作者本地的原始记录，不要改动。
+3. 跑完后提交 `results/revision/T6/` 的汇总（absolute、paired、timing、clean checks、report.md 和决策 JSON）。决策结论由 Claude 审核后再定，执行 AI 不要自行判断走哪条路线。
 
 ## 执行 AI 当前待办（Claude 2026-11-24 下午审核结论）
 
