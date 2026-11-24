@@ -27,6 +27,7 @@ from .provenance import (
     package_source_provenance,
     verify_package_source_unchanged,
 )
+from .simple_baselines import resolve_simple_baseline
 from .train_cadr import _load_agent
 
 
@@ -55,6 +56,11 @@ def run(
         raise ValueError("the privileged CADR oracle requires paired CADR evaluation")
     if include_oracle and matched_priors:
         raise ValueError("the matched-prior ablation and privileged CADR oracle use separate configs")
+    simple_baseline, fixed_horizons = resolve_simple_baseline(config)
+    if include_oracle and simple_baseline:
+        raise ValueError("simple baselines and the privileged CADR oracle use separate configs")
+    if simple_baseline and matched_priors:
+        raise ValueError("simple baselines and the matched-prior ablation use separate configs")
     config_snapshot = output_dir / "config.json"
     inputs_snapshot = output_dir / "inputs.json"
     summary_path = output_dir / "summary.json"
@@ -113,6 +119,11 @@ def run(
     ).lower()
     if matched_priors and base_algorithm != "iql":
         raise ValueError("fixed_prior_matched requires an IQL checkpoint in this evaluator")
+    cadr_method_name = f"cadr_{base_algorithm}"
+    if matched_priors:
+        cadr_method_name = MATCHED_PRIOR_IQL_METHOD
+    elif simple_baseline:
+        cadr_method_name = f"cadr_{base_algorithm}_ablation_{simple_baseline}"
     dynamics_config = dynamics_payload["config"]
     dynamics_state = dynamics_payload["dynamics"]
     dynamics = DeltaDynamicsEnsemble(
@@ -155,6 +166,8 @@ def run(
         }
     if include_oracle:
         summary["included_privileged_cadr_oracle_age"] = True
+    if fixed_horizons:
+        summary["fixed_horizon_by_scenario"] = fixed_horizons
     if partial_path.is_file():
         partial = json.loads(partial_path.read_text(encoding="utf-8"))
         summary["evaluations"] = partial.get("evaluations", {})
@@ -201,10 +214,11 @@ def run(
                 "use_censoring": bool(config.get("use_censoring", True)),
                 "age_posterior": str(config.get("age_posterior", "legacy_cdf")),
                 "fixed_prior_probabilities": matched_priors.get(scenario_name),
+                "fixed_horizon": fixed_horizons.get(scenario_name),
             }
             cadr = evaluate_controller(
                 controller_factory=lambda: CadrController(**cadr_arguments),
-                method=MATCHED_PRIOR_IQL_METHOD if matched_priors else f"cadr_{base_algorithm}",
+                method=cadr_method_name,
                 **evaluation_arguments,
             )
             scenario_results.update(

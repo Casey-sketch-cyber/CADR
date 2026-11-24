@@ -260,6 +260,7 @@ class CadrDiffusionPolicyController(CadrController):
         use_censoring: bool = True,
         age_posterior: str = "legacy_cdf",
         fixed_prior_probabilities: Sequence[float] | None = None,
+        fixed_horizon: int | None = None,
     ) -> None:
         if age_source not in {"posterior", "oracle", "cadr_oracle_age"}:
             raise ValueError("unsupported age_source")
@@ -282,7 +283,10 @@ class CadrDiffusionPolicyController(CadrController):
             use_censoring=use_censoring,
             age_posterior=age_posterior,
             fixed_prior_probabilities=fixed_prior_probabilities,
+            fixed_horizon=fixed_horizon,
         )
+        if age_source != "posterior" and self.estimator is None:
+            raise ValueError("oracle age cannot be combined with a simple age rule")
         self.device = device
         self.obs_horizon = obs_horizon
         self.act_horizon = act_horizon
@@ -301,7 +305,7 @@ class CadrDiffusionPolicyController(CadrController):
 
         if self.age_source == "posterior":
             raise RuntimeError("oracle age can only be set for an oracle controller")
-        if age < 0 or (self.age_source == "oracle" and age > self.estimator.max_delay):
+        if age < 0 or (self.age_source == "oracle" and age > self.max_delay):
             raise ValueError("oracle age is outside the configured delay support")
         self._oracle_age = int(age)
 
@@ -324,13 +328,7 @@ class CadrDiffusionPolicyController(CadrController):
         if decision_step <= self._last_decision_step:
             raise ValueError("decision steps must be strictly increasing")
         self._last_decision_step = decision_step
-        if self.posterior_updates:
-            delay_probabilities = self.estimator.update(
-                decision_step,
-                policy_input.acknowledgements,
-            )
-        else:
-            delay_probabilities = self.estimator.probabilities
+        delay_probabilities = self._update_delay_statistics(policy_input, decision_step)
         raw_observation = np.asarray(policy_input.observation, dtype=np.float32)
         if self.age_source != "posterior":
             if self._oracle_age is None:
@@ -346,28 +344,9 @@ class CadrDiffusionPolicyController(CadrController):
             conditioned_age_entropy = 0.0
             use_map = True
         else:
-            age_probabilities = self.estimator.effective_age_probabilities(decision_step)
-            # Without content, retain the unconditional CDF posterior.
-            if self.use_content_conditioning:
-                age_probabilities = self._content_conditioned_age_probabilities(
-                    raw_observation,
-                    decision_step,
-                    age_probabilities,
-                    policy_input,
-                    delay_probabilities,
-                )
-            selected_age = int(np.argmax(age_probabilities))
-            positive_probabilities = age_probabilities[age_probabilities > 0.0]
-            conditioned_age_entropy = float(
-                -(positive_probabilities * np.log(positive_probabilities)).sum()
+            age_probabilities, selected_age, conditioned_age_entropy, use_map = (
+                self._age_decision(policy_input, decision_step, raw_observation, delay_probabilities)
             )
-            use_map = self.age_decision_rule == "map" or (
-                self.age_decision_rule == "entropy_gated"
-                and self.estimator.entropy >= self.entropy_gate_threshold
-            )
-            if use_map:
-                age_probabilities = np.zeros_like(age_probabilities)
-                age_probabilities[selected_age] = 1.0
 
         observation = torch.as_tensor(
             raw_observation,
@@ -451,15 +430,11 @@ class CadrDiffusionPolicyController(CadrController):
         )
         self._executed_actions += 1
 
-        support = np.arange(delay_probabilities.size, dtype=np.float64)
         ages = np.arange(age_probabilities.size, dtype=np.float64)
-        self._diagnostics["posterior_delay_mean"].append(
-            float(delay_probabilities @ support)
-        )
+        self._record_delay_statistics(delay_probabilities)
         self._diagnostics["effective_age_mean"].append(
             float(age_probabilities @ ages)
         )
-        self._diagnostics["posterior_entropy"].append(self.estimator.entropy)
         self._diagnostics["state_disagreement"].append(float(state_disagreement))
         self._diagnostics["epistemic_state_disagreement"].append(
             float(epistemic_state_disagreement)
