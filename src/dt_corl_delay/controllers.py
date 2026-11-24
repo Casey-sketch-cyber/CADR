@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 import statistics
+from numbers import Integral
 from typing import Any, Sequence
 
 import numpy as np
@@ -105,8 +106,8 @@ class DirectObservationController:
 class CadrController:
     """Censored-ACK Delay Reconstruction (CADR) policy wrapper.
 
-    The controller marginalizes the frozen actor over candidate current states
-    reconstructed for every plausible observation age and dynamics member.
+    By default the controller marginalizes frozen-actor actions over candidate
+    current states reconstructed for every plausible age and dynamics member.
     Current packet delay, generation time, and channel internals are never
     passed to this class.
     """
@@ -132,6 +133,8 @@ class CadrController:
         age_posterior: str = "legacy_cdf",
         fixed_prior_probabilities: Sequence[float] | None = None,
         fixed_horizon: int | None = None,
+        aggregation: str = "action_mean",
+        ensemble_members: Sequence[int] | None = None,
     ) -> None:
         if not math.isfinite(risk_blend) or risk_blend < 0.0:
             raise ValueError("risk_blend must be finite and non-negative")
@@ -140,6 +143,22 @@ class CadrController:
         supported_rules = {"posterior_mean", "map", "entropy_gated"} | SIMPLE_AGE_DECISION_RULES
         if age_decision_rule not in supported_rules:
             raise ValueError("unsupported age_decision_rule")
+        if aggregation not in {"action_mean", "state_mean", "map"}:
+            raise ValueError("unsupported aggregation")
+        if aggregation == "map":
+            if age_decision_rule not in {"posterior_mean", "map"}:
+                raise ValueError("map aggregation conflicts with age_decision_rule")
+            age_decision_rule = "map"
+        if ensemble_members is not None:
+            if not isinstance(ensemble_members, Sequence) or not ensemble_members or any(
+                isinstance(index, bool)
+                or not isinstance(index, Integral)
+                or not 0 <= index < dynamics.ensemble_size
+                for index in ensemble_members
+            ):
+                raise ValueError("ensemble_members must contain valid integer indices")
+            if len(set(ensemble_members)) != len(ensemble_members):
+                raise ValueError("ensemble_members must not contain duplicates")
         if entropy_gate_threshold < 0.0:
             raise ValueError("entropy_gate_threshold must be non-negative")
         validate_age_posterior(age_posterior, ack_lag, use_content_conditioning)
@@ -162,6 +181,12 @@ class CadrController:
         self.state_std = state_std
         self.risk_blend = risk_blend
         self.risk_threshold = risk_threshold
+        self.aggregation = aggregation
+        self.ensemble_members = (
+            tuple(int(index) for index in ensemble_members)
+            if ensemble_members is not None
+            else None
+        )
         self.age_decision_rule = age_decision_rule
         self.entropy_gate_threshold = entropy_gate_threshold
         self.use_content_conditioning = bool(use_content_conditioning)
@@ -213,6 +238,8 @@ class CadrController:
             "map_rule_used": [],
             "reconstruction_reliability": [],
         }
+        if self.aggregation == "state_mean":
+            del self._diagnostics["action_disagreement"]
         if self.estimator is None:
             del self._diagnostics["posterior_delay_mean"]
             del self._diagnostics["posterior_entropy"]
@@ -354,23 +381,41 @@ class CadrController:
             age_hypothesis_state_disagreement = torch.zeros(
                 (), device=self.agent.device
             )
-            action_disagreement = torch.zeros((), device=self.agent.device)
-        else:
-            age_states = self.dynamics.rollout_age_candidates(
-                normalized_observation,
-                self._actions,
-                maximum_age=len(age_probabilities) - 1,
+            action_disagreement = (
+                None
+                if self.aggregation == "state_mean"
+                else torch.zeros((), device=self.agent.device)
             )
+        else:
+            maximum_age = len(age_probabilities) - 1
+            if self.ensemble_members is None:
+                age_states = self.dynamics.rollout_age_candidates(
+                    normalized_observation, self._actions, maximum_age=maximum_age
+                )
+                ensemble_size = self.dynamics.ensemble_size
+            else:
+                age_states = self.dynamics.rollout_age_candidates(
+                    normalized_observation,
+                    self._actions,
+                    maximum_age=maximum_age,
+                    member_indices=self.ensemble_members,
+                )
+                ensemble_size = len(self.ensemble_members)
             states = age_states.reshape(-1, self.dynamics.state_dim)
             age_weights = torch.as_tensor(
                 age_probabilities,
                 dtype=torch.float32,
                 device=self.agent.device,
             )
-            weights = age_weights.repeat_interleave(self.dynamics.ensemble_size)
-            weights = weights / self.dynamics.ensemble_size
-            candidate_actions = self.agent.act_normalized(states)
-            action = (candidate_actions * weights[:, None]).sum(dim=0, keepdim=True)
+            weights = age_weights.repeat_interleave(ensemble_size)
+            weights = weights / ensemble_size
+            if self.aggregation == "state_mean":
+                mean_state = (states * weights[:, None]).sum(dim=0, keepdim=True)
+                action = self.agent.act_normalized(mean_state)
+                candidate_actions = None
+            else:
+                candidate_actions = self.agent.act_normalized(states)
+                action = (candidate_actions * weights[:, None]).sum(dim=0, keepdim=True)
 
             (
                 state_disagreement,
@@ -380,10 +425,13 @@ class CadrController:
                 age_states,
                 age_weights,
             )
-            action_mean = (candidate_actions * weights[:, None]).sum(dim=0)
-            action_disagreement = torch.sqrt(
-                ((candidate_actions - action_mean).pow(2).mean(dim=-1) * weights).sum()
-            )
+            if candidate_actions is None:
+                action_disagreement = None
+            else:
+                action_mean = (candidate_actions * weights[:, None]).sum(dim=0)
+                action_disagreement = torch.sqrt(
+                    ((candidate_actions - action_mean).pow(2).mean(dim=-1) * weights).sum()
+                )
         reliability = 1.0
         if self.risk_blend > 0.0:
             direct_action = self.agent.act_normalized(normalized_observation)
@@ -406,7 +454,8 @@ class CadrController:
         self._diagnostics["age_hypothesis_state_disagreement"].append(
             float(age_hypothesis_state_disagreement)
         )
-        self._diagnostics["action_disagreement"].append(float(action_disagreement))
+        if action_disagreement is not None:
+            self._diagnostics["action_disagreement"].append(float(action_disagreement))
         self._diagnostics["selected_age"].append(float(selected_age))
         self._diagnostics["conditioned_age_entropy"].append(conditioned_age_entropy)
         self._diagnostics["map_rule_used"].append(float(use_map))

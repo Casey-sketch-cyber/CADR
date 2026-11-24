@@ -16,6 +16,7 @@ import torch
 from .controllers import CadrController, DirectObservationController
 from .delayed_eval import evaluate_controller
 from .dynamics import DeltaDynamicsEnsemble, Float64AgeRolloutEnsemble
+from .evaluation_methods import select_evaluation_methods
 from .matched_prior import MATCHED_PRIOR_IQL_METHOD, matched_delay_priors
 from .oracle_age_eval import (
     CADR_ORACLE_AGE_METHOD,
@@ -61,6 +62,10 @@ def run(
         raise ValueError("simple baselines and the privileged CADR oracle use separate configs")
     if simple_baseline and matched_priors:
         raise ValueError("simple baselines and the matched-prior ablation use separate configs")
+    available_methods = ("direct", "cadr") if include_cadr else ("direct",)
+    if include_oracle:
+        available_methods += (CADR_ORACLE_AGE_METHOD,)
+    selected_methods = select_evaluation_methods(config, available_methods)
     config_snapshot = output_dir / "config.json"
     inputs_snapshot = output_dir / "inputs.json"
     summary_path = output_dir / "summary.json"
@@ -167,11 +172,17 @@ def run(
         },
     }
     if controller_timing_device is not None:
+        selected_members = config.get("ensemble_members")
         summary["controller_timing_context"] = {
             "max_delay": int(config["max_delay"]),
-            "cadr_ensemble_size": dynamics.ensemble_size,
+            "cadr_ensemble_size": (
+                len(selected_members) if isinstance(selected_members, list) else dynamics.ensemble_size
+            ),
         }
-    if include_oracle:
+    if "evaluation_methods" in config:
+        summary["algorithm"] = f"selected_frozen_{base_algorithm.upper()}_evaluation"
+        summary["evaluation_methods"] = list(selected_methods)
+    if CADR_ORACLE_AGE_METHOD in selected_methods:
         summary["included_privileged_cadr_oracle_age"] = True
     if fixed_horizons:
         summary["fixed_horizon_by_scenario"] = fixed_horizons
@@ -195,13 +206,14 @@ def run(
             "environment_config": config.get("environment"),
             "controller_timing_device": controller_timing_device,
         }
-        direct = evaluate_controller(
-            controller_factory=lambda: DirectObservationController(agent, state_mean, state_std),
-            method=f"direct_observation_{base_algorithm}",
-            **evaluation_arguments,
-        )
-        scenario_results: dict[str, Any] = {"direct": direct}
-        if include_cadr:
+        scenario_results: dict[str, Any] = {}
+        if "direct" in selected_methods:
+            scenario_results["direct"] = evaluate_controller(
+                controller_factory=lambda: DirectObservationController(agent, state_mean, state_std),
+                method=f"direct_observation_{base_algorithm}",
+                **evaluation_arguments,
+            )
+        if "cadr" in selected_methods or CADR_ORACLE_AGE_METHOD in selected_methods:
             cadr_arguments = {
                 "agent": agent,
                 "dynamics": dynamics,
@@ -222,21 +234,24 @@ def run(
                 "age_posterior": str(config.get("age_posterior", "legacy_cdf")),
                 "fixed_prior_probabilities": matched_priors.get(scenario_name),
                 "fixed_horizon": fixed_horizons.get(scenario_name),
+                **{
+                    key: config[key]
+                    for key in ("aggregation", "ensemble_members")
+                    if key in config
+                },
             }
-            cadr = evaluate_controller(
-                controller_factory=lambda: CadrController(**cadr_arguments),
-                method=cadr_method_name,
-                **evaluation_arguments,
-            )
-            scenario_results.update(
-                {
-                    "cadr": cadr,
-                    "paired_mean_return_delta": (
-                        cadr["mean_return"] - direct["mean_return"]
-                    ),
-                }
-            )
-            if include_oracle:
+            if "cadr" in selected_methods:
+                cadr = evaluate_controller(
+                    controller_factory=lambda: CadrController(**cadr_arguments),
+                    method=cadr_method_name,
+                    **evaluation_arguments,
+                )
+                scenario_results["cadr"] = cadr
+                if "direct" in scenario_results:
+                    scenario_results["paired_mean_return_delta"] = (
+                        cadr["mean_return"] - scenario_results["direct"]["mean_return"]
+                    )
+            if CADR_ORACLE_AGE_METHOD in selected_methods:
                 # Only this privileged evaluation receives the selected packet age.
                 scenario_results[CADR_ORACLE_AGE_METHOD] = evaluate_controller(
                     controller_factory=lambda: OracleAgeCadrController(**cadr_arguments),
