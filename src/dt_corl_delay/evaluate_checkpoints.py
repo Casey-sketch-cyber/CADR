@@ -15,7 +15,7 @@ import torch
 
 from .controllers import CadrController, DirectObservationController
 from .delayed_eval import evaluate_controller
-from .dynamics import DeltaDynamicsEnsemble
+from .dynamics import DeltaDynamicsEnsemble, Float64AgeRolloutEnsemble
 from .matched_prior import MATCHED_PRIOR_IQL_METHOD, matched_delay_priors
 from .oracle_age_eval import (
     CADR_ORACLE_AGE_METHOD,
@@ -126,7 +126,11 @@ def run(
         cadr_method_name = f"cadr_{base_algorithm}_ablation_{simple_baseline}"
     dynamics_config = dynamics_payload["config"]
     dynamics_state = dynamics_payload["dynamics"]
-    dynamics = DeltaDynamicsEnsemble(
+    dynamics_float64 = config.get("diagnostic_float64_dynamics", False)
+    if not isinstance(dynamics_float64, bool):
+        raise ValueError("diagnostic_float64_dynamics must be a boolean")
+    ensemble_class = Float64AgeRolloutEnsemble if dynamics_float64 else DeltaDynamicsEnsemble
+    dynamics = ensemble_class(
         state_dim=int(dynamics_state["state_dim"]),
         action_dim=int(dynamics_state["action_dim"]),
         hidden_dims=tuple(int(value) for value in dynamics_config["dynamics_hidden_dims"]),
@@ -135,6 +139,8 @@ def run(
         device=device,
     )
     dynamics.load_checkpoint(dynamics_state)
+    if dynamics_float64:
+        dynamics.double()
     dynamics.eval()
     state_mean = base_payload["state_mean"].to(device)
     state_std = base_payload["state_std"].to(device)
@@ -157,6 +163,7 @@ def run(
             "torch": torch.__version__,
             "cuda": torch.version.cuda,
             "device": torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu",
+            "dynamics_rollout_dtype": "float64" if dynamics_float64 else "float32",
         },
     }
     if controller_timing_device is not None:

@@ -14,6 +14,31 @@ except ImportError:  # The lightweight Windows control environment omits torch.
 
 @unittest.skipIf(torch is None, "torch is validated in the remote research environment")
 class TorchComponentsTest(unittest.TestCase):
+    def test_float64_dynamics_rollout_preserves_policy_input_dtype(self) -> None:
+        from dt_corl_delay.dynamics import DeltaDynamicsEnsemble, Float64AgeRolloutEnsemble
+
+        options = dict(
+            state_dim=3, action_dim=2, hidden_dims=(8,), ensemble_size=2,
+            learning_rate=3e-4, device=torch.device("cpu"),
+        )
+        torch.manual_seed(123)
+        original = DeltaDynamicsEnsemble(**options)
+        diagnostic = Float64AgeRolloutEnsemble(**options)
+        diagnostic.load_checkpoint(original.checkpoint())
+        diagnostic.double()
+        reference = copy.deepcopy(original).double()
+        generator = torch.Generator().manual_seed(321)
+        state = torch.randn(1, 3, generator=generator)
+        actions = [torch.randn(1, 2, generator=generator) for _ in range(3)]
+        actual = diagnostic.rollout_age_candidates(state, actions, maximum_age=3)
+        expected = reference.rollout_age_candidates(
+            state.double(), [action.double() for action in actions], maximum_age=3,
+        ).to(dtype=state.dtype)
+        self.assertEqual(actual.dtype, torch.float32)
+        torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+        torch.testing.assert_close(actual[0], state.expand(2, -1), rtol=0, atol=0)
+        self.assertTrue(all(p.dtype == torch.float32 for p in original.parameters()))
+
     def test_cql_update_and_checkpoint_are_finite(self) -> None:
         from dt_corl_delay.cql import CQLAgent, CQLHyperparameters
 
