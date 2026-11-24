@@ -1,0 +1,145 @@
+{
+  "task": "mujoco/hopper/medium-v0",
+  "training_seed": 101,
+  "bootstrap": {
+    "method": "within-training-seed paired percentile",
+    "resamples": 10000,
+    "seed": 20261123,
+    "level": 0.95
+  },
+  "delta_directions": {
+    "precision": "same Colab GPU, float64 dynamics minus float32 dynamics",
+    "cross_hardware": "previous Colab L4 minus RTX 5090 archive"
+  },
+  "criteria": {
+    "direct_returns_bitwise_unchanged": true,
+    "cadr_returns_changed_in_both_scenarios": true,
+    "cadr_ci95_includes_zero_in_both_scenarios": true,
+    "magnitude_review": "Compare the two CADR precision maxima and their ratios against the historical cross-hardware maxima. TASKS.md describes comparable episode shifts of tens to hundreds without giving an exact cutoff.",
+    "t0_gate_scope": "T0a remains a separate same-hardware regression gate."
+  },
+  "groups": [
+    {
+      "scenario": "drifting_to_long_delay",
+      "method": "direct_observation_iql",
+      "training_seeds": 1,
+      "paired_episodes": 20,
+      "float32_return_mean": 1515.622704609359,
+      "float64_return_mean": 1515.622704609359,
+      "precision_mean_return_delta": 0.0,
+      "precision_mean_absolute_return_delta": 0.0,
+      "precision_max_absolute_return_delta": 0.0,
+      "precision_return_bit_mismatches": 0,
+      "precision_mean_delta_ci95": [
+        0.0,
+        0.0
+      ],
+      "precision_ci95_includes_zero": true,
+      "archive_rtx5090_return_mean": 1514.440261032156,
+      "previous_l4_return_mean": 1514.440261032156,
+      "float32_minus_previous_l4_mean": 1.1824435772030029,
+      "cross_hardware_mean_return_delta": 0.0,
+      "cross_hardware_max_absolute_return_delta": 0.0,
+      "precision_to_cross_hardware_max_abs_ratio": null,
+      "cross_hardware_mean_delta_ci95": [
+        0.0,
+        0.0
+      ],
+      "cross_hardware_mean_delta_abs_fraction_of_archive_mean": 0.0,
+      "cross_hardware_soft_condition_met": true
+    },
+    {
+      "scenario": "drifting_to_long_delay",
+      "method": "cadr_iql",
+      "training_seeds": 1,
+      "paired_episodes": 20,
+      "float32_return_mean": 3052.463215097453,
+      "float64_return_mean": 3034.589412950021,
+      "precision_mean_return_delta": -17.873802147431697,
+      "precision_mean_absolute_return_delta": 49.24368053623599,
+      "precision_max_absolute_return_delta": 546.9965812672276,
+      "precision_return_bit_mismatches": 20,
+      "precision_mean_delta_ci95": [
+        -81.78246539544163,
+        24.5137320251397
+      ],
+      "precision_ci95_includes_zero": true,
+      "archive_rtx5090_return_mean": 3088.418194674766,
+      "previous_l4_return_mean": 3030.662845112555,
+      "float32_minus_previous_l4_mean": 21.800369984898225,
+      "cross_hardware_mean_return_delta": -57.75534956221096,
+      "cross_hardware_max_absolute_return_delta": 606.1082251099056,
+      "precision_to_cross_hardware_max_abs_ratio": 0.9024734504601728,
+      "cross_hardware_mean_delta_ci95": [
+        -138.96146583131687,
+        0.02536471633631485
+      ],
+      "cross_hardware_mean_delta_abs_fraction_of_archive_mean": 0.018700624695773445,
+      "cross_hardware_soft_condition_met": true
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "direct_observation_iql",
+      "training_seeds": 1,
+      "paired_episodes": 20,
+      "float32_return_mean": 233.31010159441811,
+      "float64_return_mean": 233.31010159441811,
+      "precision_mean_return_delta": 0.0,
+      "precision_mean_absolute_return_delta": 0.0,
+      "precision_max_absolute_return_delta": 0.0,
+      "precision_return_bit_mismatches": 0,
+      "precision_mean_delta_ci95": [
+        0.0,
+        0.0
+      ],
+      "precision_ci95_includes_zero": true,
+      "archive_rtx5090_return_mean": 233.31008421701156,
+      "previous_l4_return_mean": 233.31008421701156,
+      "float32_minus_previous_l4_mean": 1.7377406550167507e-05,
+      "cross_hardware_mean_return_delta": 0.0,
+      "cross_hardware_max_absolute_return_delta": 0.0,
+      "precision_to_cross_hardware_max_abs_ratio": null,
+      "cross_hardware_mean_delta_ci95": [
+        0.0,
+        0.0
+      ],
+      "cross_hardware_mean_delta_abs_fraction_of_archive_mean": 0.0,
+      "cross_hardware_soft_condition_met": true
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "cadr_iql",
+      "training_seeds": 1,
+      "paired_episodes": 20,
+      "float32_return_mean": 1933.4806264895956,
+      "float64_return_mean": 1934.6807046294184,
+      "precision_mean_return_delta": 1.2000781398228297,
+      "precision_mean_absolute_return_delta": 11.706219532380356,
+      "precision_max_absolute_return_delta": 87.5373296305097,
+      "precision_return_bit_mismatches": 20,
+      "precision_mean_delta_ci95": [
+        -10.137432005690846,
+        13.631611055095286
+      ],
+      "precision_ci95_includes_zero": true,
+      "archive_rtx5090_return_mean": 1926.8428422608972,
+      "previous_l4_return_mean": 1940.8432287429323,
+      "float32_minus_previous_l4_mean": -7.362602253336718,
+      "cross_hardware_mean_return_delta": 14.000386482035049,
+      "cross_hardware_max_absolute_return_delta": 320.83616558070344,
+      "precision_to_cross_hardware_max_abs_ratio": 0.27284121623904173,
+      "cross_hardware_mean_delta_ci95": [
+        -5.955635613196396,
+        48.42345851245516
+      ],
+      "cross_hardware_mean_delta_abs_fraction_of_archive_mean": 0.007265972177371473,
+      "cross_hardware_soft_condition_met": true
+    }
+  ],
+  "colab_gpu": {
+    "name": "Tesla T4",
+    "memory_mib": 15360,
+    "driver": "580.82.07"
+  },
+  "reviewed_code_commit": "7c7d8196f8660d359254932cec5f12117add64a2"
+}
