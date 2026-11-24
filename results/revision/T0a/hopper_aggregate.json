@@ -1,0 +1,335 @@
+{
+  "task": "hopper",
+  "expected_episodes_per_arm": 480,
+  "completed_episodes_pre_and_post": [
+    480,
+    480
+  ],
+  "paired": 480,
+  "groups_with_differences": [],
+  "passed": true,
+  "canonical_comparator": {
+    "passed": true,
+    "reference_count": 480,
+    "candidate_count": 480,
+    "paired_count": 480,
+    "missing_count": 0,
+    "extra_count": 0,
+    "missing_from_candidate": [],
+    "extra_in_candidate": [],
+    "return_abs_tol": 0,
+    "return_rel_tol": 0,
+    "return_nonzero_deltas": 0,
+    "return_mismatches": 0,
+    "return_max_abs_delta": 0,
+    "return_mean_delta": 0,
+    "success_pairs_with_values": 0,
+    "success_mismatches": 0
+  },
+  "groups": [
+    {
+      "scenario": "changepoint_in_support",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "changepoint_in_support",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "clean_delay_0",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "clean_delay_0",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "drifting_to_long_delay",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "drifting_to_long_delay",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_1",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_1",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_16",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_16",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_2",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_2",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_4",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_4",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_8",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "fixed_delay_8",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "iid_in_support",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "iid_in_support",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "markov_switching",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "ood_changepoint",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "ood_changepoint",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0,
+        "recovery_steps": 0
+      }
+    },
+    {
+      "scenario": "ood_support_shift",
+      "method": "cadr",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    },
+    {
+      "scenario": "ood_support_shift",
+      "method": "direct",
+      "episodes": 20,
+      "max_abs_return_difference": 0,
+      "mean_return_difference": 0,
+      "bit_mismatch_counts": {
+        "returns": 0,
+        "episode_lengths": 0
+      }
+    }
+  ],
+  "environment": {
+    "phase": "evaluated",
+    "started_at": 1795498442.2134006,
+    "commits": {
+      "pre": "33d104e08fe739790672f3c14dc123ff0f4199f1",
+      "post": "41e9ca605be887b2cfa71dd6a46191d392e838f8"
+    },
+    "config_sha256": "ad1aad2f5ad0394accb7d4e19ebb16d98d45ea8c08b36e50e457e69ca88fd3c0",
+    "inputs_sha256": {
+      "runs/formal_v1_iql_hopper_seed101/checkpoint.pt": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3",
+      "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8",
+      "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+    },
+    "gpu": {
+      "name": "Tesla T4",
+      "memory_mib": 15360,
+      "driver": "580.82.07"
+    },
+    "arms": {
+      "pre": {
+        "runtime": {
+          "cuda": "12.8",
+          "device": "Tesla T4",
+          "torch": "2.8.0+cu128"
+        }
+      },
+      "post": {
+        "runtime": {
+          "cuda": "12.8",
+          "device": "Tesla T4",
+          "torch": "2.8.0+cu128"
+        }
+      }
+    },
+    "ended_at": 1795499758.36421
+  }
+}
