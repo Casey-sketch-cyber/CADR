@@ -1,0 +1,879 @@
+{
+  "batches": [
+    {
+      "batch_id": "hopper_seed101",
+      "eval_episodes": 20,
+      "expected_episodes": 3360,
+      "inputs": [
+        {
+          "bytes": 3964423,
+          "path": "runs/formal_v1_iql_hopper_seed101/checkpoint.pt",
+          "role": "policy",
+          "sha256": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+        },
+        {
+          "bytes": 4401637,
+          "path": "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/direct.json",
+          "config_sha256": "a47c98be2dc354a820645a4d0044da8d3880a0943495963a3fbd75321121bc90",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_hopper_seed101_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/full_legacy.json",
+          "config_sha256": "1becd5d223140dd53f4ea814b328f16e3072c00c0b4dca54302659148e767ff8",
+          "evaluation_key": "cadr",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_hopper_seed101_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/full_hazard.json",
+          "config_sha256": "a899dde998b34f1cc13539a897285ee6fff4a8c1ced41c4d9affe533fc131a9f",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed101_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/no_censoring.json",
+          "config_sha256": "a217fcd7d76a27a496d608aa90920ca7ad9075a575c3f7135fb7741b2314e357",
+          "evaluation_key": "cadr",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_hopper_seed101_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/in_order_age.json",
+          "config_sha256": "a2c7810f0eaf595ede3e8db9789261848819e91afffaf7fd992b0a2b5e134369",
+          "evaluation_key": "cadr",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_hopper_seed101_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/cadr_oracle_age.json",
+          "config_sha256": "ce3033f5c46636fb93647985bd69151da2d82e7e47589f96b54f02b4668ca3d6",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_hopper_seed101_cadr_oracle_age"
+        },
+        {
+          "clean_exception": "Does not use observation content to detect fresh observations.",
+          "clean_expected_equal": false,
+          "config": "configs/revision/T6/hopper/seed101/no_content.json",
+          "config_sha256": "8fa97a3adfe1165244264384f79b3050e06e74d2428ee8a33d8e97fbb9d34ec3",
+          "evaluation_key": "cadr",
+          "method_id": "no_content",
+          "output_basename": "revision_v2_t6_hopper_seed101_no_content"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/ack_map_hazard.json",
+          "config_sha256": "50a30260273795d504f75c026658860d374a2645d5e23f4727f9d125ed613a4e",
+          "evaluation_key": "cadr",
+          "method_id": "ack_map_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed101_ack_map_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/fixed_prior.json",
+          "config_sha256": "61cadc7bcd94eabfe2a7ff64a35d80bd168e9246ff3e8a72a7e46b7c6fc010b6",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_prior",
+          "output_basename": "revision_v2_t6_hopper_seed101_fixed_prior"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/fixed_prior_matched.json",
+          "config_sha256": "9295eac74546ec62e29e271038d196a457eb3beb3f836eb6be9b42b1adc427ef",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_prior_matched",
+          "output_basename": "revision_v2_t6_hopper_seed101_fixed_prior_matched"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/single_model.json",
+          "config_sha256": "6b7dd2995cdf08783ab71bc2c0b471f0a474e93b581f3ed7c3c86a9e384ed627",
+          "evaluation_key": "cadr",
+          "method_id": "single_model",
+          "output_basename": "revision_v2_t6_hopper_seed101_single_model"
+        },
+        {
+          "clean_exception": "Always uses the declared one-step nominal horizon.",
+          "clean_expected_equal": false,
+          "config": "configs/revision/T6/hopper/seed101/fixed_horizon_model_mean.json",
+          "config_sha256": "b4ab039af107687484bfe5026941b5be57c7980902f212a61eb2614b2a4cd2d1",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_horizon_model_mean",
+          "output_basename": "revision_v2_t6_hopper_seed101_fixed_horizon_model_mean"
+        },
+        {
+          "clean_exception": "Always uses the declared two-step nominal horizon.",
+          "clean_expected_equal": false,
+          "config": "configs/revision/T6/hopper/seed101/fixed_horizon_model_max_support.json",
+          "config_sha256": "dc8252df9ebd6c3b7a33b7e50a657ce738a188af5dc3be4d0a1137b6c9810f88",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_horizon_model_max_support",
+          "output_basename": "revision_v2_t6_hopper_seed101_fixed_horizon_model_max_support"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed101/full_hazard_state_mean.json",
+          "config_sha256": "60614e4336b1b32761bb14a9dfac74f92fe7f93b5f9d5e3bd3304563f3de01de",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard_state_mean",
+          "output_basename": "revision_v2_t6_hopper_seed101_full_hazard_state_mean"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "fixed_delay_16",
+        "iid_in_support",
+        "markov_switching",
+        "changepoint_in_support",
+        "drifting_to_long_delay",
+        "ood_support_shift",
+        "ood_changepoint"
+      ],
+      "source_config": "configs/generated_formal_v1_hopper_cadr_seed101.json",
+      "source_config_sha256": "ad1aad2f5ad0394accb7d4e19ebb16d98d45ea8c08b36e50e457e69ca88fd3c0",
+      "task": "hopper",
+      "training_seed": 101
+    },
+    {
+      "batch_id": "hopper_seed102",
+      "eval_episodes": 20,
+      "expected_episodes": 3360,
+      "inputs": [
+        {
+          "bytes": 3964551,
+          "path": "runs/formal_v1_iql_hopper_seed102/checkpoint.pt",
+          "role": "policy",
+          "sha256": "89ef96b0258b508a9246a84805895720188b034738789bf89ab0ed3082a22853"
+        },
+        {
+          "bytes": 4401701,
+          "path": "runs/formal_v1_cadr_hopper_seed102/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "75b2d4de00a5511f82c0bfaf5ea8afe0f15d6f01f34d70ff75c9abf045da56d0"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/direct.json",
+          "config_sha256": "92acde511b0c2579951fa8ea2f1d7a24bbc780b4541702f2a32f7f3fcc676125",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_hopper_seed102_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/full_legacy.json",
+          "config_sha256": "762e8f909ec26146d64f757cf306971f9fb89d82f2e503ba9232bf01a7a68d51",
+          "evaluation_key": "cadr",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_hopper_seed102_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/full_hazard.json",
+          "config_sha256": "9368ae88e133de54235d83005aac9d8096610a2314ffeea9c7d2bb56510d04c4",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed102_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/no_censoring.json",
+          "config_sha256": "c8554f4f55770238bef3687fd7333cc779416e8d255bbbe374259116cd5cfb9e",
+          "evaluation_key": "cadr",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_hopper_seed102_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/in_order_age.json",
+          "config_sha256": "6664fc91d8a77dd3b661e3c0e7aa0f7f8d655cd0cc2a9b83ab8a5e33a8ffbbc9",
+          "evaluation_key": "cadr",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_hopper_seed102_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/cadr_oracle_age.json",
+          "config_sha256": "19b646ab0e7a87acff8b640a26e3cae06c83920aa8f6d0d8a528bb9b4deedfe9",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_hopper_seed102_cadr_oracle_age"
+        },
+        {
+          "clean_exception": "Does not use observation content to detect fresh observations.",
+          "clean_expected_equal": false,
+          "config": "configs/revision/T6/hopper/seed102/no_content.json",
+          "config_sha256": "75808361460957b4229e9c1d514c908abd6f31e5986951bf219e99eab3470960",
+          "evaluation_key": "cadr",
+          "method_id": "no_content",
+          "output_basename": "revision_v2_t6_hopper_seed102_no_content"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/ack_map_hazard.json",
+          "config_sha256": "7ce3220099b7a854f61d6a4dee9c15825d5057a54068accf309a8c859d480ee8",
+          "evaluation_key": "cadr",
+          "method_id": "ack_map_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed102_ack_map_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/fixed_prior.json",
+          "config_sha256": "f951d6195eea6a4b73ff68d519b7d347ed5877f281bf7a7fe506ff52d71067bc",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_prior",
+          "output_basename": "revision_v2_t6_hopper_seed102_fixed_prior"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/fixed_prior_matched.json",
+          "config_sha256": "ce58ba691556e3397fb3e4a56d6ee00b74adb0c3ad7db273bc7b4a6ebe6ee63b",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_prior_matched",
+          "output_basename": "revision_v2_t6_hopper_seed102_fixed_prior_matched"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/single_model.json",
+          "config_sha256": "b5466d9b699027486109ba40d02a8a921184a4d688a4b584fb638119bf51d4aa",
+          "evaluation_key": "cadr",
+          "method_id": "single_model",
+          "output_basename": "revision_v2_t6_hopper_seed102_single_model"
+        },
+        {
+          "clean_exception": "Always uses the declared one-step nominal horizon.",
+          "clean_expected_equal": false,
+          "config": "configs/revision/T6/hopper/seed102/fixed_horizon_model_mean.json",
+          "config_sha256": "2ed0869cdd941c50c461801544d3fbb7b4dc2b33c1c2933df10e1a8a95ed78c8",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_horizon_model_mean",
+          "output_basename": "revision_v2_t6_hopper_seed102_fixed_horizon_model_mean"
+        },
+        {
+          "clean_exception": "Always uses the declared two-step nominal horizon.",
+          "clean_expected_equal": false,
+          "config": "configs/revision/T6/hopper/seed102/fixed_horizon_model_max_support.json",
+          "config_sha256": "79c528cece52d34b0aa6785a9a24c1c9cec51faf1d8387ca4fccf17345bb5858",
+          "evaluation_key": "cadr",
+          "method_id": "fixed_horizon_model_max_support",
+          "output_basename": "revision_v2_t6_hopper_seed102_fixed_horizon_model_max_support"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed102/full_hazard_state_mean.json",
+          "config_sha256": "738cf4d953ef1369366b8a5fb8d4b03535ccc1064722dfdd2f6635fc6620adba",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard_state_mean",
+          "output_basename": "revision_v2_t6_hopper_seed102_full_hazard_state_mean"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "fixed_delay_16",
+        "iid_in_support",
+        "markov_switching",
+        "changepoint_in_support",
+        "drifting_to_long_delay",
+        "ood_support_shift",
+        "ood_changepoint"
+      ],
+      "source_config": "configs/generated_formal_v1_hopper_cadr_seed102.json",
+      "source_config_sha256": "5ad504a19d2e706d0aa24ae478c32fdd4b84a139db6d995063ceb770b517c61b",
+      "task": "hopper",
+      "training_seed": 102
+    },
+    {
+      "batch_id": "hopper_seed103",
+      "eval_episodes": 20,
+      "expected_episodes": 1440,
+      "inputs": [
+        {
+          "bytes": 3964487,
+          "path": "runs/formal_v1_iql_hopper_seed103/checkpoint.pt",
+          "role": "policy",
+          "sha256": "5fd89798ef4b9b2c03b8ead52eaf7f83d0ec93f10b14ab5770445478bdcb85e7"
+        },
+        {
+          "bytes": 4401637,
+          "path": "runs/formal_v1_cadr_hopper_seed103/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "6f3eb810f2d5a4be7d86565c14260902b1d6ecf49939f9e2a711d7b7ba1cbe50"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed103/direct.json",
+          "config_sha256": "a80e52eb4bf3e5828a68c33feb9eb8bd5ba1b14897e680a2c18e8558d85a3f20",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_hopper_seed103_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed103/full_legacy.json",
+          "config_sha256": "785754f55712ca3102903bc7a24358c203b8127a1c6e13ed07748424be19cda4",
+          "evaluation_key": "cadr",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_hopper_seed103_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed103/full_hazard.json",
+          "config_sha256": "ab7b4813db35aa07efd8a2207ea03cfb66882252ab32834e95266ece63e05db6",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed103_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed103/no_censoring.json",
+          "config_sha256": "60232871fedb9a2113c48a0454c2bc4a8b74d73864c0482e13d84804b7ad53de",
+          "evaluation_key": "cadr",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_hopper_seed103_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed103/in_order_age.json",
+          "config_sha256": "12ddce78780e4f3d06c7f596f317a88de0271c91eb4c02d531f42bfc2157584a",
+          "evaluation_key": "cadr",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_hopper_seed103_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed103/cadr_oracle_age.json",
+          "config_sha256": "f0bbca06e14069f165635e54adaa1693e36f4cde60976d758f02efdf740ecf73",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_hopper_seed103_cadr_oracle_age"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "fixed_delay_16",
+        "iid_in_support",
+        "markov_switching",
+        "changepoint_in_support",
+        "drifting_to_long_delay",
+        "ood_support_shift",
+        "ood_changepoint"
+      ],
+      "source_config": "configs/generated_formal_v1_hopper_cadr_seed103.json",
+      "source_config_sha256": "238e9fa0ec5b0780159ea4dc172f45a8edbf9c62d6a3eba291dcd319e1f1d3f3",
+      "task": "hopper",
+      "training_seed": 103
+    },
+    {
+      "batch_id": "hopper_seed104",
+      "eval_episodes": 20,
+      "expected_episodes": 1440,
+      "inputs": [
+        {
+          "bytes": 3964423,
+          "path": "runs/formal_v1_iql_hopper_seed104/checkpoint.pt",
+          "role": "policy",
+          "sha256": "51a8836482f14c1831ae93d43b185d6d824dfd506dd4d28c12e6ab04467bebed"
+        },
+        {
+          "bytes": 4401573,
+          "path": "runs/formal_v1_cadr_hopper_seed104/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "48d200ca4e2a9b465235fb28cd4a4a048e0f0f93a2e93f515d59ec89d4237dab"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed104/direct.json",
+          "config_sha256": "51317c73c57775bf70ad1a97aa25e5a945de1ebb4e1895a3f6fe37ec51cd3a5a",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_hopper_seed104_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed104/full_legacy.json",
+          "config_sha256": "726ba852e3e70ab4140827dfb491ae076e0fddc87563da6c09f3b786b0d663bb",
+          "evaluation_key": "cadr",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_hopper_seed104_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed104/full_hazard.json",
+          "config_sha256": "0973d4b812c5ef2bd21476dfa828bc6cfd183150dcb11cb5208125f8488cb646",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed104_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed104/no_censoring.json",
+          "config_sha256": "33411df5deb828bf1643dfd515ecf5e8e6400a6b465929a32a9084d4ba717345",
+          "evaluation_key": "cadr",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_hopper_seed104_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed104/in_order_age.json",
+          "config_sha256": "02c6ef75e5a38d01068625a684ec723e07bccce44f0811190af86691cbe0c0ee",
+          "evaluation_key": "cadr",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_hopper_seed104_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed104/cadr_oracle_age.json",
+          "config_sha256": "3b234e9d244731d04c41be306560a9849b9952a7b44cefdd24d1af646b2af28e",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_hopper_seed104_cadr_oracle_age"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "fixed_delay_16",
+        "iid_in_support",
+        "markov_switching",
+        "changepoint_in_support",
+        "drifting_to_long_delay",
+        "ood_support_shift",
+        "ood_changepoint"
+      ],
+      "source_config": "configs/generated_formal_v1_hopper_cadr_seed104.json",
+      "source_config_sha256": "afe330c35e65c2da3896529b6fbba700e2e370e1d54baa5839da7a3c5106aa34",
+      "task": "hopper",
+      "training_seed": 104
+    },
+    {
+      "batch_id": "hopper_seed105",
+      "eval_episodes": 20,
+      "expected_episodes": 1440,
+      "inputs": [
+        {
+          "bytes": 3964487,
+          "path": "runs/formal_v1_iql_hopper_seed105/checkpoint.pt",
+          "role": "policy",
+          "sha256": "f6352bfff8671b018793c3d6b1b618f529347cbc30b317805e3c2a0ff44995a3"
+        },
+        {
+          "bytes": 4401701,
+          "path": "runs/formal_v1_cadr_hopper_seed105/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "89ccd3b69978b69e2e1bc95878618a8ff728caf3c3ac9ee8c1596ce205c32b90"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed105/direct.json",
+          "config_sha256": "9bc3c1f7ca2ce392ecec53683057169bd7ed4970dd304a47ccd20663c8183561",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_hopper_seed105_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed105/full_legacy.json",
+          "config_sha256": "1d33f21ef0cd6f425afe05305b186727c15189c476ef6275de6629b941accb13",
+          "evaluation_key": "cadr",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_hopper_seed105_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed105/full_hazard.json",
+          "config_sha256": "f7a2848b1d7a8ec09177aac2a9081fe6df610d2319a0a862e317bcf1008f1552",
+          "evaluation_key": "cadr",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_hopper_seed105_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed105/no_censoring.json",
+          "config_sha256": "c790536cf4006c1cefed5cb446ea6a25d03863a71d6afbc4d39c0098f46b4f18",
+          "evaluation_key": "cadr",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_hopper_seed105_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed105/in_order_age.json",
+          "config_sha256": "e5f9c203db768e3d767892e2faec1eb9c9ad9c7356093ad6d462111da4f3fde1",
+          "evaluation_key": "cadr",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_hopper_seed105_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/hopper/seed105/cadr_oracle_age.json",
+          "config_sha256": "5965a359b01860f13fa40480a7fa968832192513a4f81569a2c83a70e7d3840c",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_hopper_seed105_cadr_oracle_age"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "fixed_delay_16",
+        "iid_in_support",
+        "markov_switching",
+        "changepoint_in_support",
+        "drifting_to_long_delay",
+        "ood_support_shift",
+        "ood_changepoint"
+      ],
+      "source_config": "configs/generated_formal_v1_hopper_cadr_seed105.json",
+      "source_config_sha256": "e51ce98dbf5ea861e913d7e92b7b1bc9deb24f91b4fad9ee4594e75562a74e1b",
+      "task": "hopper",
+      "training_seed": 105
+    },
+    {
+      "batch_id": "pickcube_seed101",
+      "eval_episodes": 20,
+      "expected_episodes": 1080,
+      "inputs": [
+        {
+          "bytes": 35257889,
+          "path": "runs/formal_v1_dp_pickcube_seed101/checkpoints/best_eval_success_once.pt",
+          "role": "policy",
+          "sha256": "713ff18c9dcfac416350fd77c9a636cdfa70001780d3a00f3e6b5e7a1ad6a527"
+        },
+        {
+          "bytes": 5371557,
+          "path": "runs/formal_v1_dp_dynamics_pickcube_seed101/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "0e15a34cb24e1c69321029fe02ef0b82c29829dc24b2ace877c1132e2dae5820"
+        },
+        {
+          "bytes": 39414170,
+          "path": "data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.h5",
+          "role": "dataset",
+          "sha256": "2532b37a4086e8fce9ec18781f38b2552bba5bf146e6b83e96d293905812c59c"
+        },
+        {
+          "path": "data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.json",
+          "role": "dataset_metadata",
+          "sha256": "8b7d4d78715aac218eb50c5d1584c21501959b756b2a6dc896a1ea1f3e8df167"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed101/direct.json",
+          "config_sha256": "a83428d19101e69ce6a402372f15955ec27c4fb41a5ca878a102a3e1523da520",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_pickcube_seed101_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed101/full_legacy.json",
+          "config_sha256": "a3dc8e91012a0aa27925a91341d65e6bf281929e194f838fcac803f54d0d2d80",
+          "evaluation_key": "cadr_dp",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_pickcube_seed101_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed101/full_hazard.json",
+          "config_sha256": "9dd447b2244303be4dee02b7ecd18e33444968843560ded04cac5f6379933663",
+          "evaluation_key": "cadr_dp",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_pickcube_seed101_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed101/no_censoring.json",
+          "config_sha256": "428fc474f802bb6b590f49139e5068d6d9ba3fdf794395a80fee17694c6fb8a3",
+          "evaluation_key": "cadr_dp_no_censoring",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_pickcube_seed101_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed101/in_order_age.json",
+          "config_sha256": "e9aba30cf4003d4d16a633597b50abdbbc5f0a72eba2827b1ea82cf04b23a4ad",
+          "evaluation_key": "cadr_dp_in_order_age",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_pickcube_seed101_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed101/cadr_oracle_age.json",
+          "config_sha256": "b1af79939c6366c7e91067d06a421ada3bcf1277b624dfb31023ec9a5ab68f91",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_pickcube_seed101_cadr_oracle_age"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_distribution",
+        "markov_switching",
+        "ood_changepoint",
+        "ood_drifting"
+      ],
+      "source_config": "configs/generated_formal_v1_pickcube_synthetic_seed101.json",
+      "source_config_sha256": "2894dc4080aa9836ac5f91fbe756efd198c64640aa18c071d96d469bc5264c79",
+      "task": "pickcube",
+      "training_seed": 101
+    },
+    {
+      "batch_id": "pickcube_seed102",
+      "eval_episodes": 20,
+      "expected_episodes": 1080,
+      "inputs": [
+        {
+          "bytes": 35257889,
+          "path": "runs/formal_v1_dp_pickcube_seed102/checkpoints/best_eval_success_once.pt",
+          "role": "policy",
+          "sha256": "42bea41adb3f441b6f71782aac90a1ae63c9d6369177f050b7315ee1446066c5"
+        },
+        {
+          "bytes": 5371621,
+          "path": "runs/formal_v1_dp_dynamics_pickcube_seed102/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "8e8394c3e18696f2f1e0c5f4c841f8dd3e5954dd238a7af51249071880b5e522"
+        },
+        {
+          "bytes": 39414170,
+          "path": "data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.h5",
+          "role": "dataset",
+          "sha256": "2532b37a4086e8fce9ec18781f38b2552bba5bf146e6b83e96d293905812c59c"
+        },
+        {
+          "path": "data/maniskill/processed/PickCube-v1/motionplanning_state_official_dp_v3_0_1/trajectory.state.pd_ee_delta_pos.physx_cpu.json",
+          "role": "dataset_metadata",
+          "sha256": "8b7d4d78715aac218eb50c5d1584c21501959b756b2a6dc896a1ea1f3e8df167"
+        }
+      ],
+      "runs": [
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed102/direct.json",
+          "config_sha256": "cd2fc52fc27083f2c6d3548c7e7298407971c169233ea84b8108aa9fcbf484d7",
+          "evaluation_key": "direct",
+          "method_id": "direct",
+          "output_basename": "revision_v2_t6_pickcube_seed102_direct"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed102/full_legacy.json",
+          "config_sha256": "da97690738a989bb6f23558da37895156fff5e36700d5b0ad4522b449cdb4689",
+          "evaluation_key": "cadr_dp",
+          "method_id": "full_legacy",
+          "output_basename": "revision_v2_t6_pickcube_seed102_full_legacy"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed102/full_hazard.json",
+          "config_sha256": "eec5e5332624ffa9891dee790977cd11ba76de9e3ee8a13a288af52524317bba",
+          "evaluation_key": "cadr_dp",
+          "method_id": "full_hazard",
+          "output_basename": "revision_v2_t6_pickcube_seed102_full_hazard"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed102/no_censoring.json",
+          "config_sha256": "92265710a4e8c46eebf8cd9a8bfee0f215a260b67627e88808bfc2f142f6596c",
+          "evaluation_key": "cadr_dp_no_censoring",
+          "method_id": "no_censoring",
+          "output_basename": "revision_v2_t6_pickcube_seed102_no_censoring"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed102/in_order_age.json",
+          "config_sha256": "18323b12266cff6f0f093aa9c45cce8fde183f483021230eeda24ea2ccf5f283",
+          "evaluation_key": "cadr_dp_in_order_age",
+          "method_id": "in_order_age",
+          "output_basename": "revision_v2_t6_pickcube_seed102_in_order_age"
+        },
+        {
+          "clean_exception": null,
+          "clean_expected_equal": true,
+          "config": "configs/revision/T6/pickcube/seed102/cadr_oracle_age.json",
+          "config_sha256": "cdc6772f219c5865589c1f515b544b7c87eea67b89586cd5f729c4fd4d3edf5d",
+          "evaluation_key": "cadr_oracle_age",
+          "method_id": "cadr_oracle_age",
+          "output_basename": "revision_v2_t6_pickcube_seed102_cadr_oracle_age"
+        }
+      ],
+      "scenarios": [
+        "clean_delay_0",
+        "fixed_delay_1",
+        "fixed_delay_2",
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_distribution",
+        "markov_switching",
+        "ood_changepoint",
+        "ood_drifting"
+      ],
+      "source_config": "configs/generated_formal_v1_pickcube_synthetic_seed102.json",
+      "source_config_sha256": "1fa67d946202d8050e2398bb04e087d38c04edcdb3772df416ca5442195e2453",
+      "task": "pickcube",
+      "training_seed": 102
+    }
+  ],
+  "expected_episodes": 13200,
+  "method_runs": 58,
+  "schema_version": 1,
+  "stage": "p2a"
+}

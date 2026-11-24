@@ -14,6 +14,7 @@ import torch
 
 from .delayed_eval import evaluate_controller
 from .dynamics import DeltaDynamicsEnsemble
+from .evaluation_methods import select_evaluation_methods
 from .maniskill_diffusion import (
     CadrDiffusionPolicyController,
     OfficialDiffusionPolicyController,
@@ -62,6 +63,16 @@ def run(
         raise ValueError("simple baselines and privileged oracle comparators use separate configs")
     if simple_baseline and matched_priors:
         raise ValueError("simple baselines and the matched-prior ablation use separate configs")
+    ablation_variant = simple_baseline or config.get("ablation_variant")
+    cadr_method_key = f"cadr_dp_{ablation_variant}" if ablation_variant else "cadr_dp"
+    available_methods = ("direct", cadr_method_key)
+    if include_legacy_oracle:
+        available_methods += ("oracle_dp",)
+    if include_oracle:
+        available_methods += (CADR_ORACLE_AGE_METHOD,)
+    selected_methods = select_evaluation_methods(
+        config, available_methods, aliases={"cadr": cadr_method_key}
+    )
     config_snapshot = output_dir / "config.json"
     summary_path = output_dir / "summary.json"
     progress_path = output_dir / "progress.json"
@@ -180,10 +191,6 @@ def run(
     if progress_path.is_file():
         progress = json.loads(progress_path.read_text(encoding="utf-8"))
         evaluations = progress.get("evaluations", {})
-    ablation_variant = simple_baseline or config.get("ablation_variant")
-    cadr_method_key = (
-        f"cadr_dp_{ablation_variant}" if ablation_variant else "cadr_dp"
-    )
     cadr_method_name = (
         f"cadr_dp_ablation_{ablation_variant}_plus_official_maniskill_dp"
         if ablation_variant
@@ -204,7 +211,7 @@ def run(
             "environment_config": config["environment"],
             "controller_timing_device": controller_timing_device,
         }
-        if "direct" not in scenario_evaluations:
+        if "direct" in selected_methods and "direct" not in scenario_evaluations:
             scenario_evaluations["direct"] = evaluate_controller(
                 controller_factory=lambda: OfficialDiffusionPolicyController(
                     **common_controller_arguments
@@ -213,7 +220,7 @@ def run(
                 **common_evaluation_arguments,
             )
             _write_json(progress_path, {"evaluations": evaluations})
-        if cadr_method_key not in scenario_evaluations:
+        if cadr_method_key in selected_methods and cadr_method_key not in scenario_evaluations:
             scenario_evaluations[cadr_method_key] = evaluate_controller(
                 controller_factory=lambda: CadrDiffusionPolicyController(
                     **cadr_controller_arguments,
@@ -225,7 +232,7 @@ def run(
             )
             _write_json(progress_path, {"evaluations": evaluations})
         if (
-            include_legacy_oracle
+            "oracle_dp" in selected_methods
             and "oracle_dp" not in scenario_evaluations
         ):
             scenario_evaluations["oracle_dp"] = evaluate_controller(
@@ -241,7 +248,10 @@ def run(
                 **common_evaluation_arguments,
             )
             _write_json(progress_path, {"evaluations": evaluations})
-        if include_oracle and CADR_ORACLE_AGE_METHOD not in scenario_evaluations:
+        if (
+            CADR_ORACLE_AGE_METHOD in selected_methods
+            and CADR_ORACLE_AGE_METHOD not in scenario_evaluations
+        ):
             scenario_evaluations[CADR_ORACLE_AGE_METHOD] = evaluate_controller(
                 controller_factory=lambda: CadrDiffusionPolicyController(
                     **cadr_controller_arguments,
@@ -255,7 +265,7 @@ def run(
 
     clean = evaluations.get("clean_delay_0")
     clean_equivalence = None
-    if clean is not None:
+    if clean is not None and "direct" in clean and cadr_method_key in clean:
         exact_fields = (
             "returns",
             "episode_lengths",
@@ -286,9 +296,7 @@ def run(
         "deployment_parameter_updates": False,
         "local_source_provenance": local_source_provenance,
         "information_boundary": "received_observations_revealed_ACKs_and_executed_actions_only",
-        "included_privileged_oracle_upper_bound": bool(
-            config.get("include_oracle_upper_bound", False)
-        ),
+        "included_privileged_oracle_upper_bound": "oracle_dp" in selected_methods,
         "ablation_variant": ablation_variant,
         "cadr_method_key": cadr_method_key,
         "policy": policy_provenance,
@@ -311,7 +319,10 @@ def run(
             "max_delay": int(config["max_delay"]),
             "cadr_ensemble_size": dynamics.ensemble_size,
         }
-    if include_oracle:
+    if "evaluation_methods" in config:
+        summary["algorithm"] = "selected_frozen_official_ManiSkill_DP_evaluation"
+        summary["evaluation_methods"] = list(selected_methods)
+    if CADR_ORACLE_AGE_METHOD in selected_methods:
         summary["included_privileged_cadr_oracle_age"] = True
     if fixed_horizons:
         summary["fixed_horizon_by_scenario"] = fixed_horizons

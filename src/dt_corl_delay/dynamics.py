@@ -116,21 +116,29 @@ class DeltaDynamicsEnsemble(nn.Module):
         action_history: Sequence[torch.Tensor],
         maximum_age: int,
         normalized_state_clip: float = 20.0,
+        *,
+        member_indices: Sequence[int] | None = None,
     ) -> torch.Tensor:
         """Batch all observation-age hypotheses.
 
         Returns ``[age, ensemble, state]`` and is numerically equivalent to
         calling :meth:`rollout_members` once per action suffix, while reducing
         model calls from quadratic to linear in ``maximum_age``.
+        When given, ``member_indices`` is the ordered subset to evaluate.
         """
 
         if initial_state.shape != (1, self.state_dim):
             raise ValueError(f"expected initial state shape (1, {self.state_dim})")
         if maximum_age < 0 or maximum_age > len(action_history):
             raise ValueError("maximum_age must be covered by action_history")
+        members = (
+            self.members
+            if member_indices is None
+            else tuple(self.members[index] for index in member_indices)
+        )
         age_count = maximum_age + 1
         states = initial_state.reshape(1, 1, self.state_dim).expand(
-            age_count, self.ensemble_size, self.state_dim
+            age_count, len(members), self.state_dim
         ).clone()
         history_length = len(action_history)
         for phase in range(maximum_age):
@@ -149,7 +157,7 @@ class DeltaDynamicsEnsemble(nn.Module):
                 dim=0,
             )
             updated = states.clone()
-            for member_index, member in enumerate(self.members):
+            for member_index, member in enumerate(members):
                 member_states = states[active_ages, member_index]
                 inputs = torch.cat((member_states, phase_actions), dim=-1)
                 predicted = (member_states + member(inputs)).clamp(
@@ -185,10 +193,13 @@ class Float64AgeRolloutEnsemble(DeltaDynamicsEnsemble):
         action_history: Sequence[torch.Tensor],
         maximum_age: int,
         normalized_state_clip: float = 20.0,
+        *,
+        member_indices: Sequence[int] | None = None,
     ) -> torch.Tensor:
         return super().rollout_age_candidates(
             initial_state.double(),
             [action.double() for action in action_history],
             maximum_age,
             normalized_state_clip,
+            member_indices=member_indices,
         ).to(dtype=initial_state.dtype)
