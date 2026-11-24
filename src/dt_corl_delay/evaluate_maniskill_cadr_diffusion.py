@@ -22,6 +22,7 @@ from .maniskill_diffusion import (
 )
 from .offline_data import load_offline_transitions
 from .matched_prior import matched_delay_priors
+from .oracle_age_eval import CADR_ORACLE_AGE_METHOD, include_cadr_oracle_age
 from .provenance import (
     file_input_provenance,
     package_source_provenance,
@@ -49,6 +50,12 @@ def run(
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     matched_priors = matched_delay_priors(config)
+    include_oracle = include_cadr_oracle_age(config)
+    include_legacy_oracle = bool(config.get("include_oracle_upper_bound", False))
+    if include_oracle and include_legacy_oracle:
+        raise ValueError("choose either the privileged T3 comparator or the legacy oracle")
+    if include_oracle and matched_priors:
+        raise ValueError("the matched-prior ablation and privileged CADR oracle use separate configs")
     config_snapshot = output_dir / "config.json"
     summary_path = output_dir / "summary.json"
     progress_path = output_dir / "progress.json"
@@ -211,7 +218,7 @@ def run(
             )
             _write_json(progress_path, {"evaluations": evaluations})
         if (
-            bool(config.get("include_oracle_upper_bound", False))
+            include_legacy_oracle
             and "oracle_dp" not in scenario_evaluations
         ):
             scenario_evaluations["oracle_dp"] = evaluate_controller(
@@ -223,6 +230,17 @@ def run(
                     "privileged_oracle_age_state_reconstruction_plus_"
                     "official_maniskill_dp_upper_bound"
                 ),
+                privileged_selected_age=True,
+                **common_evaluation_arguments,
+            )
+            _write_json(progress_path, {"evaluations": evaluations})
+        if include_oracle and CADR_ORACLE_AGE_METHOD not in scenario_evaluations:
+            scenario_evaluations[CADR_ORACLE_AGE_METHOD] = evaluate_controller(
+                controller_factory=lambda: CadrDiffusionPolicyController(
+                    **cadr_controller_arguments,
+                    age_source=CADR_ORACLE_AGE_METHOD,
+                ),
+                method=CADR_ORACLE_AGE_METHOD,
                 privileged_selected_age=True,
                 **common_evaluation_arguments,
             )
@@ -286,6 +304,8 @@ def run(
             "max_delay": int(config["max_delay"]),
             "cadr_ensemble_size": dynamics.ensemble_size,
         }
+    if include_oracle:
+        summary["included_privileged_cadr_oracle_age"] = True
     _write_json(summary_path, summary)
     return summary
 
