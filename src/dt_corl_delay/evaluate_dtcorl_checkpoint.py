@@ -120,6 +120,10 @@ def run(
         "memory_steps": int(evaluation_config["posterior_memory_steps"]),
         "decay_time": float(evaluation_config["posterior_decay_time"]),
         "prior_strength": float(evaluation_config["posterior_prior_strength"]),
+        "age_posterior": str(evaluation_config.get("age_posterior", "legacy_cdf")),
+        "use_content_conditioning": bool(
+            evaluation_config.get("use_content_conditioning", True)
+        ),
     }
     evaluations: dict[str, Any] = {}
     if progress_path.is_file():

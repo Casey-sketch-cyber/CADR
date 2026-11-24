@@ -20,7 +20,11 @@ import numpy as np
 import torch
 
 from .channel import PolicyInput
-from .delay_belief import CensoredAckDelayEstimator
+from .delay_belief import (
+    CensoredAckDelayEstimator,
+    ContentConditionedAgePosterior,
+    validate_age_posterior,
+)
 
 
 OFFICIAL_DT_CORL_COMMIT = "7e44adf934b8aef91ca6fb9e057a1935c6a167c9"
@@ -130,9 +134,13 @@ class OfficialDTCorlAckMapController:
         decay_time: float = 48.0,
         prior_strength: float = 2.0,
         age_source: str = "ack_map",
+        age_posterior: str = "legacy_cdf",
+        use_content_conditioning: bool = True,
     ) -> None:
         if age_source not in {"ack_map", "oracle"}:
             raise ValueError("age_source must be 'ack_map' or 'oracle'")
+        use_hazard_content = age_source == "ack_map" and use_content_conditioning
+        validate_age_posterior(age_posterior, ack_lag, use_hazard_content)
         self.agent = agent
         self.autoencoder = autoencoder
         self.dynamics = dynamics
@@ -151,9 +159,17 @@ class OfficialDTCorlAckMapController:
         self._rewards: list[float] = []
         self._diagnostics: dict[str, list[float]] = {}
         self._oracle_age: int | None = None
+        # v1 DT-ACK used the unconditional CDF MAP. Only the opt-in hazard
+        # mode shares CADR's content-conditioned posterior.
+        self._content_age_posterior = (
+            ContentConditionedAgePosterior(maximum_delay, age_posterior)
+            if age_posterior == "hazard" and use_hazard_content
+            else None
+        )
 
     def reset(self, initial_observation: np.ndarray) -> None:
-        del initial_observation
+        if self._content_age_posterior is not None:
+            self._content_age_posterior.reset(initial_observation)
         self.estimator.reset()
         self._actions.clear()
         self._rewards.clear()
@@ -171,15 +187,27 @@ class OfficialDTCorlAckMapController:
             policy_input.acknowledgements,
         )
         age_probabilities = self.estimator.effective_age_probabilities(decision_step)
+        raw_observation = np.asarray(policy_input.observation)
         if self.age_source == "oracle":
             if self._oracle_age is None:
                 raise RuntimeError("oracle age was not provided before the decision")
             selected_age = self._oracle_age
         else:
+            if self._content_age_posterior is not None:
+                age_probabilities, _, _ = self._content_age_posterior.probabilities(
+                    raw_observation,
+                    decision_step,
+                    policy_input.acknowledgements,
+                    age_probabilities,
+                    delay_probabilities,
+                )
+                self._diagnostics.setdefault("hazard_zero_mass_fallback", []).append(
+                    float(self._content_age_posterior.hazard_zero_mass_fallback)
+                )
             selected_age = int(np.argmax(age_probabilities))
         age = min(selected_age, self.maximum_delay, len(self._actions), len(self._rewards))
         observation = torch.as_tensor(
-            np.asarray(policy_input.observation),
+            raw_observation,
             dtype=torch.float32,
             device=self.agent.device,
         ).unsqueeze(0)

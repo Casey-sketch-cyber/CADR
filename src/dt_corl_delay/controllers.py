@@ -10,7 +10,11 @@ import numpy as np
 import torch
 
 from .channel import PolicyInput
-from .delay_belief import CensoredAckDelayEstimator
+from .delay_belief import (
+    CensoredAckDelayEstimator,
+    ContentConditionedAgePosterior,
+    validate_age_posterior,
+)
 from .dynamics import DeltaDynamicsEnsemble
 
 
@@ -124,6 +128,7 @@ class CadrController:
         use_content_conditioning: bool = True,
         posterior_updates: bool = True,
         use_censoring: bool = True,
+        age_posterior: str = "legacy_cdf",
     ) -> None:
         if not math.isfinite(risk_blend) or risk_blend < 0.0:
             raise ValueError("risk_blend must be finite and non-negative")
@@ -133,6 +138,7 @@ class CadrController:
             raise ValueError("unsupported age_decision_rule")
         if entropy_gate_threshold < 0.0:
             raise ValueError("entropy_gate_threshold must be non-negative")
+        validate_age_posterior(age_posterior, ack_lag, use_content_conditioning)
         self.agent = agent
         self.dynamics = dynamics
         self.state_mean = state_mean
@@ -153,14 +159,12 @@ class CadrController:
         )
         self._actions: list[torch.Tensor] = []
         self._diagnostics: dict[str, list[float]] = {}
-        self._known_selected_generated_step = 0
-        self._previous_observation: np.ndarray | None = None
+        self._content_age_posterior = ContentConditionedAgePosterior(max_delay, age_posterior)
 
     def reset(self, initial_observation: np.ndarray) -> None:
         self.estimator.reset()
         self._actions.clear()
-        self._known_selected_generated_step = 0
-        self._previous_observation = np.asarray(initial_observation).copy()
+        self._content_age_posterior.reset(initial_observation)
         self._diagnostics = {
             "posterior_delay_mean": [],
             "effective_age_mean": [],
@@ -183,49 +187,21 @@ class CadrController:
         decision_step: int,
         base_probabilities: np.ndarray,
         policy_input: PolicyInput[np.ndarray],
+        delay_probabilities: np.ndarray,
     ) -> np.ndarray:
-        for acknowledgement in policy_input.acknowledgements:
-            self._known_selected_generated_step = max(
-                self._known_selected_generated_step,
-                int(acknowledgement.generated_step),
-            )
-        changed = (
-            self._previous_observation is not None
-            and not np.array_equal(observation, self._previous_observation)
+        probabilities, exact_age, changed = self._content_age_posterior.probabilities(
+            observation,
+            decision_step,
+            policy_input.acknowledgements,
+            base_probabilities,
+            delay_probabilities,
         )
-        exact_age = False
-        if decision_step == 0:
-            probabilities = np.asarray([1.0], dtype=np.float64)
-            exact_age = True
-        elif not changed:
-            age = min(
-                self.estimator.max_delay,
-                max(0, decision_step - self._known_selected_generated_step),
-            )
-            probabilities = np.zeros(age + 1, dtype=np.float64)
-            probabilities[age] = 1.0
-            exact_age = True
-        else:
-            # A changed value proves that the selected packet is newer than
-            # the latest packet whose generation step has already been
-            # revealed. It does not reveal which newer packet arrived.
-            maximum_possible_age = min(
-                len(base_probabilities) - 1,
-                max(0, decision_step - self._known_selected_generated_step - 1),
-            )
-            probabilities = base_probabilities[: maximum_possible_age + 1].copy()
-            mass = float(probabilities.sum())
-            if mass <= 1e-15:
-                probabilities = np.full(
-                    maximum_possible_age + 1,
-                    1.0 / (maximum_possible_age + 1),
-                    dtype=np.float64,
-                )
-            else:
-                probabilities /= mass
-        self._previous_observation = observation.copy()
         self._diagnostics["exact_age_from_unchanged_observation"].append(float(exact_age))
         self._diagnostics["observation_changed"].append(float(changed))
+        if self._content_age_posterior.age_posterior == "hazard":
+            self._diagnostics.setdefault("hazard_zero_mass_fallback", []).append(
+                float(self._content_age_posterior.hazard_zero_mass_fallback)
+            )
         return probabilities
 
     @torch.inference_mode()
@@ -239,12 +215,14 @@ class CadrController:
             delay_probabilities = self.estimator.probabilities
         age_probabilities = self.estimator.effective_age_probabilities(decision_step)
         raw_observation = np.asarray(policy_input.observation)
+        # Without content, the observation-change constraint on G_t is absent.
         if self.use_content_conditioning:
             age_probabilities = self._content_conditioned_age_probabilities(
                 raw_observation,
                 decision_step,
                 age_probabilities,
                 policy_input,
+                delay_probabilities,
             )
         selected_age = int(np.argmax(age_probabilities))
         positive_probabilities = age_probabilities[age_probabilities > 0.0]
