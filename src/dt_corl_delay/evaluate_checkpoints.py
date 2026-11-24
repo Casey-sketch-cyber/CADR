@@ -16,6 +16,7 @@ import torch
 from .controllers import CadrController, DirectObservationController
 from .delayed_eval import evaluate_controller
 from .dynamics import DeltaDynamicsEnsemble
+from .matched_prior import MATCHED_PRIOR_IQL_METHOD, matched_delay_priors
 from .provenance import (
     file_input_provenance,
     package_source_provenance,
@@ -43,6 +44,7 @@ def run(
     include_cadr: bool = True,
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
+    matched_priors = matched_delay_priors(config)
     config_snapshot = output_dir / "config.json"
     inputs_snapshot = output_dir / "inputs.json"
     summary_path = output_dir / "summary.json"
@@ -99,6 +101,8 @@ def run(
     base_algorithm = str(
         base_payload.get("agent_kind", base_payload["config"].get("algorithm", "iql"))
     ).lower()
+    if matched_priors and base_algorithm != "iql":
+        raise ValueError("fixed_prior_matched requires an IQL checkpoint in this evaluator")
     dynamics_config = dynamics_payload["config"]
     dynamics_state = dynamics_payload["dynamics"]
     dynamics = DeltaDynamicsEnsemble(
@@ -177,11 +181,12 @@ def run(
                     posterior_updates=bool(config.get("posterior_updates", True)),
                     use_censoring=bool(config.get("use_censoring", True)),
                     age_posterior=str(config.get("age_posterior", "legacy_cdf")),
+                    fixed_prior_probabilities=matched_priors.get(scenario_name),
                 ),
                 dataset_id=config["dataset_id"], scenario=scenario,
                 episodes=int(config["eval_episodes"]), seed=paired_seed,
                 ack_lag=int(config["ack_lag"]), cvar_alpha=float(config["cvar_alpha"]),
-                method=f"cadr_{base_algorithm}",
+                method=MATCHED_PRIOR_IQL_METHOD if matched_priors else f"cadr_{base_algorithm}",
                 environment_config=config.get("environment"),
                 controller_timing_device=controller_timing_device,
             )

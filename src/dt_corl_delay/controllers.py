@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import statistics
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 import torch
@@ -129,6 +129,7 @@ class CadrController:
         posterior_updates: bool = True,
         use_censoring: bool = True,
         age_posterior: str = "legacy_cdf",
+        fixed_prior_probabilities: Sequence[float] | None = None,
     ) -> None:
         if not math.isfinite(risk_blend) or risk_blend < 0.0:
             raise ValueError("risk_blend must be finite and non-negative")
@@ -149,6 +150,8 @@ class CadrController:
         self.entropy_gate_threshold = entropy_gate_threshold
         self.use_content_conditioning = bool(use_content_conditioning)
         self.posterior_updates = bool(posterior_updates)
+        if fixed_prior_probabilities is not None and self.posterior_updates:
+            raise ValueError("a fixed delay prior requires posterior_updates=false")
         self.estimator = CensoredAckDelayEstimator(
             max_delay=max_delay,
             ack_lag=ack_lag,
@@ -156,6 +159,7 @@ class CadrController:
             decay_time=decay_time,
             prior_strength=prior_strength,
             use_censoring=use_censoring,
+            fixed_prior_probabilities=fixed_prior_probabilities,
         )
         self._actions: list[torch.Tensor] = []
         self._diagnostics: dict[str, list[float]] = {}

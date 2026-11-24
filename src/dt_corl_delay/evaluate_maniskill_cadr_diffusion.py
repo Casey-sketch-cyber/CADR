@@ -21,6 +21,7 @@ from .maniskill_diffusion import (
     official_maniskill_source_provenance,
 )
 from .offline_data import load_offline_transitions
+from .matched_prior import matched_delay_priors
 from .provenance import (
     file_input_provenance,
     package_source_provenance,
@@ -47,6 +48,7 @@ def run(
     resume: bool = False,
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
+    matched_priors = matched_delay_priors(config)
     config_snapshot = output_dir / "config.json"
     summary_path = output_dir / "summary.json"
     progress_path = output_dir / "progress.json"
@@ -201,7 +203,8 @@ def run(
         if cadr_method_key not in scenario_evaluations:
             scenario_evaluations[cadr_method_key] = evaluate_controller(
                 controller_factory=lambda: CadrDiffusionPolicyController(
-                    **cadr_controller_arguments
+                    **cadr_controller_arguments,
+                    fixed_prior_probabilities=matched_priors.get(scenario_name),
                 ),
                 method=cadr_method_name,
                 **common_evaluation_arguments,

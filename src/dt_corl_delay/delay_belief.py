@@ -174,6 +174,7 @@ class CensoredAckDelayEstimator:
         prior_probabilities: Sequence[float] | None = None,
         em_iterations: int = 8,
         use_censoring: bool = True,
+        fixed_prior_probabilities: Sequence[float] | None = None,
     ) -> None:
         if max_delay < 0:
             raise ValueError("max_delay must be non-negative")
@@ -193,6 +194,11 @@ class CensoredAckDelayEstimator:
         self.prior_strength = prior_strength
         self.em_iterations = em_iterations
         self.use_censoring = use_censoring
+        self._fixed_prior = fixed_prior_probabilities is not None
+        if self._fixed_prior:
+            if prior_probabilities is not None:
+                raise ValueError("cannot specify both an online and a fixed prior")
+            prior_probabilities = fixed_prior_probabilities
         if prior_probabilities is None:
             # A weak short-delay preference makes the cold start usable while
             # retaining non-zero support for every OOD delay in the model.
@@ -202,7 +208,14 @@ class CensoredAckDelayEstimator:
             prior = np.asarray(prior_probabilities, dtype=np.float64)
             if prior.shape != (max_delay + 1,):
                 raise ValueError("prior_probabilities has the wrong length")
-        if not np.isfinite(prior).all() or np.any(prior <= 0.0):
+        if self._fixed_prior:
+            if (
+                not np.isfinite(prior).all()
+                or np.any(prior < 0.0)
+                or not np.isclose(prior.sum(), 1.0, atol=1e-8, rtol=0.0)
+            ):
+                raise ValueError("fixed prior must be finite, nonnegative and sum to one")
+        elif not np.isfinite(prior).all() or np.any(prior <= 0.0):
             raise ValueError("prior probabilities must be finite and positive")
         self._prior = prior / prior.sum()
         self._probabilities = self._prior.copy()
@@ -224,6 +237,8 @@ class CensoredAckDelayEstimator:
         return float(-(probabilities * np.log(probabilities)).sum())
 
     def update(self, decision_step: int, acknowledgements: Sequence[Ack]) -> np.ndarray:
+        if self._fixed_prior:
+            raise ValueError("cannot update a fixed delay prior")
         if decision_step <= self._last_step:
             raise ValueError("decision steps must be strictly increasing")
         self._last_step = decision_step
