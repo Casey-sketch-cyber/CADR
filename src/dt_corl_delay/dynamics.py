@@ -173,3 +173,22 @@ class DeltaDynamicsEnsemble(nn.Module):
         self.members.load_state_dict(checkpoint["members"])
         if load_optimizer:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
+
+
+class Float64AgeRolloutEnsemble(DeltaDynamicsEnsemble):
+    """Evaluate age rollouts in float64 while preserving the policy input dtype."""
+
+    @torch.inference_mode()
+    def rollout_age_candidates(
+        self,
+        initial_state: torch.Tensor,
+        action_history: Sequence[torch.Tensor],
+        maximum_age: int,
+        normalized_state_clip: float = 20.0,
+    ) -> torch.Tensor:
+        return super().rollout_age_candidates(
+            initial_state.double(),
+            [action.double() for action in action_history],
+            maximum_age,
+            normalized_state_clip,
+        ).to(dtype=initial_state.dtype)
