@@ -261,9 +261,15 @@ class CadrDiffusionPolicyController(CadrController):
         age_posterior: str = "legacy_cdf",
         fixed_prior_probabilities: Sequence[float] | None = None,
         fixed_horizon: int | None = None,
+        age_quantile: float | None = None,
+        aggregation: str = "action_mean",
     ) -> None:
         if age_source not in {"posterior", "oracle", "cadr_oracle_age"}:
             raise ValueError("unsupported age_source")
+        if aggregation != "action_mean":
+            raise ValueError("CADR-DP requires action_mean aggregation in the controller config")
+        if age_decision_rule == "upper_quantile" and age_source != "posterior":
+            raise ValueError("upper_quantile cannot be combined with privileged oracle age")
         super().__init__(
             agent=agent,
             dynamics=dynamics,
@@ -284,6 +290,8 @@ class CadrDiffusionPolicyController(CadrController):
             age_posterior=age_posterior,
             fixed_prior_probabilities=fixed_prior_probabilities,
             fixed_horizon=fixed_horizon,
+            age_quantile=age_quantile,
+            aggregation=aggregation,
         )
         if age_source != "posterior" and self.estimator is None:
             raise ValueError("oracle age cannot be combined with a simple age rule")
@@ -377,6 +385,10 @@ class CadrDiffusionPolicyController(CadrController):
             )
             weights = age_weights.repeat_interleave(self.dynamics.ensemble_size)
             weights = weights / self.dynamics.ensemble_size
+            # CADR-DP pools reconstructed states before its single conditioned
+            # diffusion call per chunk, including MAP and upper_quantile. This
+            # preserves the in-order DP behavior at alpha=1. IQL separately
+            # pools per-member actor actions for a selected age.
             reconstructed_normalized = (states * weights[:, None]).sum(dim=0)
             (
                 state_disagreement,

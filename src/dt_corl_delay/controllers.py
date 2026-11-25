@@ -18,6 +18,7 @@ from .delay_belief import (
 )
 from .dynamics import DeltaDynamicsEnsemble
 from .simple_baselines import SIMPLE_AGE_DECISION_RULES
+from .upper_quantile import upper_age_quantile, validate_age_quantile
 
 
 def state_disagreement_components(
@@ -135,16 +136,25 @@ class CadrController:
         fixed_horizon: int | None = None,
         aggregation: str = "action_mean",
         ensemble_members: Sequence[int] | None = None,
+        age_quantile: float | None = None,
     ) -> None:
         if not math.isfinite(risk_blend) or risk_blend < 0.0:
             raise ValueError("risk_blend must be finite and non-negative")
         if not math.isfinite(risk_threshold) or risk_threshold < 0.0:
             raise ValueError("risk_threshold must be finite and non-negative")
-        supported_rules = {"posterior_mean", "map", "entropy_gated"} | SIMPLE_AGE_DECISION_RULES
+        supported_rules = {"posterior_mean", "map", "entropy_gated", "upper_quantile"} | SIMPLE_AGE_DECISION_RULES
         if age_decision_rule not in supported_rules:
             raise ValueError("unsupported age_decision_rule")
         if aggregation not in {"action_mean", "state_mean", "map"}:
             raise ValueError("unsupported aggregation")
+        if age_decision_rule == "upper_quantile":
+            age_quantile = validate_age_quantile(age_quantile)
+            if aggregation != "action_mean":
+                raise ValueError("upper_quantile requires action_mean aggregation")
+            if age_posterior != "hazard" or not use_content_conditioning:
+                raise ValueError("upper_quantile requires the content-conditioned hazard posterior")
+            if fixed_prior_probabilities is not None:
+                raise ValueError("upper_quantile requires the positive support of the standard delay prior")
         if aggregation == "map":
             if age_decision_rule not in {"posterior_mean", "map"}:
                 raise ValueError("map aggregation conflicts with age_decision_rule")
@@ -188,6 +198,7 @@ class CadrController:
             else None
         )
         self.age_decision_rule = age_decision_rule
+        self.age_quantile = age_quantile
         self.entropy_gate_threshold = entropy_gate_threshold
         self.use_content_conditioning = bool(use_content_conditioning)
         self.posterior_updates = bool(posterior_updates)
@@ -326,6 +337,12 @@ class CadrController:
         conditioned_age_entropy = float(
             -(positive_probabilities * np.log(positive_probabilities)).sum()
         )
+        if self.age_decision_rule == "upper_quantile":
+            assert self.age_quantile is not None
+            selected_age = upper_age_quantile(age_probabilities, self.age_quantile)
+            point_mass = np.zeros(selected_age + 1, dtype=np.float64)
+            point_mass[selected_age] = 1.0
+            return point_mass, selected_age, conditioned_age_entropy, False
         use_map = self.age_decision_rule == "map" or (
             self.age_decision_rule == "entropy_gated"
             and self.estimator.entropy >= self.entropy_gate_threshold
