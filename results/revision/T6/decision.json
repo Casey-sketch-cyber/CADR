@@ -1,0 +1,259 @@
+{
+  "all_clearly_negative_hazard_vs_legacy": [
+    "fixed_delay_1"
+  ],
+  "basis": "all five Hopper training seeds on one GPU model and runtime",
+  "censoring_title_criterion_met": false,
+  "hopper_priority_contrasts": {
+    "drifting_to_long_delay": {
+      "censoring": {
+        "ci95_high": 189.17805787042545,
+        "ci95_low": -83.5906134710349,
+        "delta": 59.14752658314297,
+        "interval_direction": "includes_zero"
+      },
+      "clean_direct_vs_oracle": {
+        "ci95_high": 187.52529950311134,
+        "ci95_low": -67.34008293913637,
+        "delta": 38.296716277406794,
+        "interval_direction": "includes_zero"
+      },
+      "hazard_vs_in_order": {
+        "ci95_high": 464.43692814223925,
+        "ci95_low": -264.7543295853711,
+        "delta": 125.14900283279464,
+        "interval_direction": "includes_zero"
+      },
+      "hazard_vs_legacy": {
+        "ci95_high": 123.50694633594195,
+        "ci95_low": -203.03403069231805,
+        "delta": -34.78238153860551,
+        "interval_direction": "includes_zero"
+      },
+      "oracle_vs_direct": {
+        "ci95_high": 2251.7821774045597,
+        "ci95_low": 1951.04937353178,
+        "delta": 2116.636815934035,
+        "interval_direction": "positive"
+      },
+      "oracle_vs_hazard": {
+        "ci95_high": 757.2252931089107,
+        "ci95_low": 289.65885043278456,
+        "delta": 514.0693727905724,
+        "interval_direction": "positive"
+      }
+    },
+    "markov_switching": {
+      "censoring": {
+        "ci95_high": 146.26795326647044,
+        "ci95_low": -100.31925190726746,
+        "delta": 26.228386663205118,
+        "interval_direction": "includes_zero"
+      },
+      "clean_direct_vs_oracle": {
+        "ci95_high": 318.9266014756298,
+        "ci95_low": -125.81423300786125,
+        "delta": 71.41682495254008,
+        "interval_direction": "includes_zero"
+      },
+      "hazard_vs_in_order": {
+        "ci95_high": -686.2048978665694,
+        "ci95_low": -1270.335163988311,
+        "delta": -985.498736749394,
+        "interval_direction": "negative"
+      },
+      "hazard_vs_legacy": {
+        "ci95_high": 219.1909777336553,
+        "ci95_low": -82.87369637750103,
+        "delta": 70.3972084980972,
+        "interval_direction": "includes_zero"
+      },
+      "oracle_vs_direct": {
+        "ci95_high": 3338.9168916543163,
+        "ci95_low": 2887.6049291317854,
+        "delta": 3144.9537725196055,
+        "interval_direction": "positive"
+      },
+      "oracle_vs_hazard": {
+        "ci95_high": 1771.4035124338093,
+        "ci95_low": 1270.702695498253,
+        "delta": 1531.4189188912032,
+        "interval_direction": "positive"
+      }
+    },
+    "ood_changepoint": {
+      "censoring": {
+        "ci95_high": 134.58237867313807,
+        "ci95_low": -116.4323882379536,
+        "delta": 16.464942476072228,
+        "interval_direction": "includes_zero"
+      },
+      "clean_direct_vs_oracle": {
+        "ci95_high": 77.23089283518127,
+        "ci95_low": -148.94555578838273,
+        "delta": -34.32607280332578,
+        "interval_direction": "includes_zero"
+      },
+      "hazard_vs_in_order": {
+        "ci95_high": -177.53196792888428,
+        "ci95_low": -663.678947975698,
+        "delta": -412.6940405295884,
+        "interval_direction": "negative"
+      },
+      "hazard_vs_legacy": {
+        "ci95_high": 640.8529096369289,
+        "ci95_low": 224.71653204555076,
+        "delta": 435.6636493965718,
+        "interval_direction": "positive"
+      },
+      "oracle_vs_direct": {
+        "ci95_high": 2714.71747740129,
+        "ci95_low": 2431.2840007941304,
+        "delta": 2593.0027903826867,
+        "interval_direction": "positive"
+      },
+      "oracle_vs_hazard": {
+        "ci95_high": 1484.4242328243924,
+        "ci95_low": 1147.458102963803,
+        "delta": 1320.6801532124507,
+        "interval_direction": "positive"
+      }
+    },
+    "ood_support_shift": {
+      "censoring": {
+        "ci95_high": 109.89979479987227,
+        "ci95_low": -123.64394197540243,
+        "delta": 2.4536247431405163,
+        "interval_direction": "includes_zero"
+      },
+      "clean_direct_vs_oracle": {
+        "ci95_high": 1789.2282436402065,
+        "ci95_low": 565.5713308327611,
+        "delta": 1167.1066741932343,
+        "interval_direction": "positive"
+      },
+      "hazard_vs_in_order": {
+        "ci95_high": 81.7217892594609,
+        "ci95_low": -367.2502692277297,
+        "delta": -152.77300477632676,
+        "interval_direction": "includes_zero"
+      },
+      "hazard_vs_legacy": {
+        "ci95_high": 462.7527252687267,
+        "ci95_low": -22.805275779438304,
+        "delta": 230.97328600753647,
+        "interval_direction": "includes_zero"
+      },
+      "oracle_vs_direct": {
+        "ci95_high": 2871.7479303704013,
+        "ci95_low": 1670.0372011331208,
+        "delta": 2311.7351062249877,
+        "interval_direction": "positive"
+      },
+      "oracle_vs_hazard": {
+        "ci95_high": 1490.7885429310961,
+        "ci95_low": 351.2851767870599,
+        "delta": 925.4041464621847,
+        "interval_direction": "positive"
+      }
+    }
+  },
+  "interval_criteria": "positive if lower bound > 0; clearly negative if upper bound < 0",
+  "long_delay_censoring_scenarios": [
+    "drifting_to_long_delay",
+    "ood_support_shift",
+    "ood_changepoint"
+  ],
+  "oracle_interpretation": "descriptive size and direction; no threshold for a large gap was specified",
+  "pickcube_direction": {
+    "clean_delay_0": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "mixed_or_zero",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "fixed_delay_1": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "positive",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "fixed_delay_2": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "positive",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "fixed_delay_4": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "positive",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "fixed_delay_8": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "positive",
+      "oracle_vs_direct": "positive",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "iid_in_distribution": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "mixed_or_zero",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "markov_switching": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "mixed_or_zero",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "ood_changepoint": {
+      "censoring": "positive",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "positive",
+      "oracle_vs_hazard": "mixed_or_zero"
+    },
+    "ood_drifting": {
+      "censoring": "mixed_or_zero",
+      "clean_direct_vs_oracle": "mixed_or_zero",
+      "hazard_vs_in_order": "mixed_or_zero",
+      "hazard_vs_legacy": "mixed_or_zero",
+      "oracle_vs_direct": "positive",
+      "oracle_vs_hazard": "mixed_or_zero"
+    }
+  },
+  "pickcube_role": "two-seed direction check only",
+  "positive_long_delay_censoring": [],
+  "priority_clearly_negative_hazard_vs_in_order": [
+    "markov_switching",
+    "ood_changepoint"
+  ],
+  "priority_positive_hazard_vs_in_order": [],
+  "priority_scenarios": [
+    "drifting_to_long_delay",
+    "markov_switching",
+    "ood_support_shift",
+    "ood_changepoint"
+  ],
+  "route_a_criteria_met": false,
+  "route_b_discussion_flag": false,
+  "route_b_interpretation": "intervals including zero indicate no discernible difference, not equivalence",
+  "status": "reviewable"
+}
