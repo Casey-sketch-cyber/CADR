@@ -30,6 +30,7 @@ from .provenance import (
     verify_package_source_unchanged,
 )
 from .simple_baselines import resolve_simple_baseline
+from .upper_quantile import upper_quantile_method
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -54,6 +55,9 @@ def run(
     matched_priors = matched_delay_priors(config)
     include_oracle = include_cadr_oracle_age(config)
     include_legacy_oracle = bool(config.get("include_oracle_upper_bound", False))
+    quantile_method = upper_quantile_method(config)
+    if quantile_method and (include_oracle or include_legacy_oracle or matched_priors):
+        raise ValueError("upper_quantile uses a separate config from oracle age and matched priors")
     if include_oracle and include_legacy_oracle:
         raise ValueError("choose either the privileged T3 comparator or the legacy oracle")
     if include_oracle and matched_priors:
@@ -63,16 +67,17 @@ def run(
         raise ValueError("simple baselines and privileged oracle comparators use separate configs")
     if simple_baseline and matched_priors:
         raise ValueError("simple baselines and the matched-prior ablation use separate configs")
-    ablation_variant = simple_baseline or config.get("ablation_variant")
+    ablation_variant = quantile_method or simple_baseline or config.get("ablation_variant")
     cadr_method_key = f"cadr_dp_{ablation_variant}" if ablation_variant else "cadr_dp"
     available_methods = ("direct", cadr_method_key)
     if include_legacy_oracle:
         available_methods += ("oracle_dp",)
     if include_oracle:
         available_methods += (CADR_ORACLE_AGE_METHOD,)
-    selected_methods = select_evaluation_methods(
-        config, available_methods, aliases={"cadr": cadr_method_key}
-    )
+    aliases = {"cadr": cadr_method_key}
+    if quantile_method:
+        aliases[quantile_method] = cadr_method_key
+    selected_methods = select_evaluation_methods(config, available_methods, aliases=aliases)
     config_snapshot = output_dir / "config.json"
     summary_path = output_dir / "summary.json"
     progress_path = output_dir / "progress.json"
@@ -187,14 +192,19 @@ def run(
         "use_censoring": bool(config.get("use_censoring", True)),
         "age_posterior": str(config.get("age_posterior", "legacy_cdf")),
     }
+    if quantile_method:
+        cadr_controller_arguments["age_quantile"] = config["age_quantile"]
+        cadr_controller_arguments["aggregation"] = config.get("aggregation", "action_mean")
     evaluations: dict[str, dict[str, Any]] = {}
     if progress_path.is_file():
         progress = json.loads(progress_path.read_text(encoding="utf-8"))
         evaluations = progress.get("evaluations", {})
     cadr_method_name = (
-        f"cadr_dp_ablation_{ablation_variant}_plus_official_maniskill_dp"
-        if ablation_variant
-        else "cadr_posterior_state_reconstruction_plus_official_maniskill_dp"
+        quantile_method or (
+            f"cadr_dp_ablation_{ablation_variant}_plus_official_maniskill_dp"
+            if ablation_variant
+            else "cadr_posterior_state_reconstruction_plus_official_maniskill_dp"
+        )
     )
     for scenario in config["scenarios"]:
         scenario_name = str(scenario["name"])
@@ -281,7 +291,7 @@ def run(
             "field_exact_equality": field_equality,
             "all_required_fields_exactly_equal": all(field_equality.values()),
         }
-        if ablation_variant is None and not clean_equivalence[
+        if (ablation_variant is None or quantile_method) and not clean_equivalence[
             "all_required_fields_exactly_equal"
         ]:
             raise ValueError(

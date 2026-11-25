@@ -30,6 +30,7 @@ from .provenance import (
 )
 from .simple_baselines import resolve_simple_baseline
 from .train_cadr import _load_agent
+from .upper_quantile import upper_quantile_method
 
 
 def _write_json_atomic(path: Path, value: Any) -> None:
@@ -53,6 +54,9 @@ def run(
     config = json.loads(config_path.read_text(encoding="utf-8"))
     matched_priors = matched_delay_priors(config)
     include_oracle = include_cadr_oracle_age(config)
+    quantile_method = upper_quantile_method(config)
+    if quantile_method and (include_oracle or matched_priors):
+        raise ValueError("upper_quantile uses a separate config from oracle age and matched priors")
     if include_oracle and not include_cadr:
         raise ValueError("the privileged CADR oracle requires paired CADR evaluation")
     if include_oracle and matched_priors:
@@ -65,7 +69,9 @@ def run(
     available_methods = ("direct", "cadr") if include_cadr else ("direct",)
     if include_oracle:
         available_methods += (CADR_ORACLE_AGE_METHOD,)
-    selected_methods = select_evaluation_methods(config, available_methods)
+    selected_methods = select_evaluation_methods(
+        config, available_methods, aliases={quantile_method: "cadr"} if quantile_method else None,
+    )
     config_snapshot = output_dir / "config.json"
     inputs_snapshot = output_dir / "inputs.json"
     summary_path = output_dir / "summary.json"
@@ -129,6 +135,8 @@ def run(
         cadr_method_name = MATCHED_PRIOR_IQL_METHOD
     elif simple_baseline:
         cadr_method_name = f"cadr_{base_algorithm}_ablation_{simple_baseline}"
+    elif quantile_method:
+        cadr_method_name = quantile_method
     dynamics_config = dynamics_payload["config"]
     dynamics_state = dynamics_payload["dynamics"]
     dynamics_float64 = config.get("diagnostic_float64_dynamics", False)
@@ -236,7 +244,7 @@ def run(
                 "fixed_horizon": fixed_horizons.get(scenario_name),
                 **{
                     key: config[key]
-                    for key in ("aggregation", "ensemble_members")
+                    for key in ("aggregation", "ensemble_members", "age_quantile")
                     if key in config
                 },
             }
