@@ -1,0 +1,760 @@
+{
+  "batches": [
+    {
+      "batch_id": "hopper_seed101",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84",
+        "dataset_metadata": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6",
+        "dynamics": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8",
+        "policy": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+      },
+      "methods": {
+        "ack_map_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "50a30260273795d504f75c026658860d374a2645d5e23f4727f9d125ed613a4e",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "2fc99ac9e5917533481f16efcb3e1a7d987d5903ea7f94ac93e4438fffe44453"
+        },
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "ce3033f5c46636fb93647985bd69151da2d82e7e47589f96b54f02b4668ca3d6",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "99ade134ba45a901d2a7b00ed55e5210c8bd7f71bfe0ac83a833de34423faf32"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "a47c98be2dc354a820645a4d0044da8d3880a0943495963a3fbd75321121bc90",
+          "evaluation_key": "direct",
+          "evaluator_method": "direct_observation_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "5633d2a561b12fc392113599fbb6c25e91c6157c2c5d02d9f8403f0066e72c18"
+        },
+        "fixed_horizon_model_max_support": {
+          "attempt_count": 1,
+          "config_sha256": "dc8252df9ebd6c3b7a33b7e50a657ce738a188af5dc3be4d0a1137b6c9810f88",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_fixed_horizon_model_max_support",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "1363a4d52216741f509c92f343c8af6ecf72cbc53ae85f1eca8a905a8a7601e1"
+        },
+        "fixed_horizon_model_mean": {
+          "attempt_count": 1,
+          "config_sha256": "b4ab039af107687484bfe5026941b5be57c7980902f212a61eb2614b2a4cd2d1",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_fixed_horizon_model_mean",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "504186b39a22a82c97dcaa856cf8ea247e2af9244f7e4f6a59e8d9c3a43e3667"
+        },
+        "fixed_prior": {
+          "attempt_count": 1,
+          "config_sha256": "61cadc7bcd94eabfe2a7ff64a35d80bd168e9246ff3e8a72a7e46b7c6fc010b6",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "ed16740f8137dbc6441576938db43ee3634311f767be7331e1375a98adef2ac6"
+        },
+        "fixed_prior_matched": {
+          "attempt_count": 1,
+          "config_sha256": "9295eac74546ec62e29e271038d196a457eb3beb3f836eb6be9b42b1adc427ef",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_fixed_prior_matched",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "cbd76bb446775250c0cb845b0f712a63bfc16aecb710b78c3c54c7f4f9c6dd36"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "a899dde998b34f1cc13539a897285ee6fff4a8c1ced41c4d9affe533fc131a9f",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "cf28b6e69a85e427fbb20447990f25328409376da2b4c308bf41d008c2495de0"
+        },
+        "full_hazard_state_mean": {
+          "attempt_count": 1,
+          "config_sha256": "60614e4336b1b32761bb14a9dfac74f92fe7f93b5f9d5e3bd3304563f3de01de",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "b30750a10788995967d29231fae1f827513795e265f373c52c0f0d70b870f205"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "1becd5d223140dd53f4ea814b328f16e3072c00c0b4dca54302659148e767ff8",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "7c9cc9c7f520d9039f84199a4feb9c602a942f11f0ab55aca53b1f4128227c4c"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "a2c7810f0eaf595ede3e8db9789261848819e91afffaf7fd992b0a2b5e134369",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_in_order_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "c7aaa0bd4999206398bcc2a47c64224c39f1ddfe8c83cdcd5b970d517ec1ab71"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "a217fcd7d76a27a496d608aa90920ca7ad9075a575c3f7135fb7741b2314e357",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "1e54b9255fe4ad8fdfe481156b0769ba8fcc919128fd48f2c8ce6048b0993e67"
+        },
+        "no_content": {
+          "attempt_count": 1,
+          "config_sha256": "8fa97a3adfe1165244264384f79b3050e06e74d2428ee8a33d8e97fbb9d34ec3",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "d0c4930618b0084ee044febd0acd01360ec1ee7cbcc868b5124553fca67895e3"
+        },
+        "single_model": {
+          "attempt_count": 1,
+          "config_sha256": "6b7dd2995cdf08783ab71bc2c0b471f0a474e93b581f3ed7c3c86a9e384ed627",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "980e080f6bde6d5d4b0b5d5cf9cce10f5365e66f90688dcc61175630b484c16d"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "1.3.0",
+        "h5py": "3.16.0",
+        "minari": "0.5.3",
+        "mujoco": "3.2.3",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "57843cf16a16241ba662828f5b6cab349f8c9b53ae1873ff9b90e2d46f4e5538",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "15dd39b95686",
+      "task": "hopper",
+      "torch": "2.8.0+cu128",
+      "training_seed": 101
+    },
+    {
+      "batch_id": "hopper_seed102",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84",
+        "dataset_metadata": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6",
+        "dynamics": "75b2d4de00a5511f82c0bfaf5ea8afe0f15d6f01f34d70ff75c9abf045da56d0",
+        "policy": "89ef96b0258b508a9246a84805895720188b034738789bf89ab0ed3082a22853"
+      },
+      "methods": {
+        "ack_map_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "7ce3220099b7a854f61d6a4dee9c15825d5057a54068accf309a8c859d480ee8",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "15fecf708b2ed40475d7dce2da08001f55923eb7bf9a89f2d9b4c8ffacf26ece"
+        },
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "19b646ab0e7a87acff8b640a26e3cae06c83920aa8f6d0d8a528bb9b4deedfe9",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "4499b016488ac55f87f5e79f6d93719724585458b904a05a32df9502abc10c1a"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "92acde511b0c2579951fa8ea2f1d7a24bbc780b4541702f2a32f7f3fcc676125",
+          "evaluation_key": "direct",
+          "evaluator_method": "direct_observation_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "f05a12265ee231aebd6e6afee759d10b3d28e9500b6f9e643818ecf2e003ea4e"
+        },
+        "fixed_horizon_model_max_support": {
+          "attempt_count": 1,
+          "config_sha256": "79c528cece52d34b0aa6785a9a24c1c9cec51faf1d8387ca4fccf17345bb5858",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_fixed_horizon_model_max_support",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "c2aa8651dc0bf1d1edefbe4b3382398dee103e02ffac15dfc6c92b783c5192dd"
+        },
+        "fixed_horizon_model_mean": {
+          "attempt_count": 1,
+          "config_sha256": "2ed0869cdd941c50c461801544d3fbb7b4dc2b33c1c2933df10e1a8a95ed78c8",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_fixed_horizon_model_mean",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "7a50a95eed5513dd9ce7a825942fba5f28ea7b3465ee128e1e6f6badced721d7"
+        },
+        "fixed_prior": {
+          "attempt_count": 1,
+          "config_sha256": "f951d6195eea6a4b73ff68d519b7d347ed5877f281bf7a7fe506ff52d71067bc",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "688025100b661f6bdedd8d365106de5dba42566f3d48e51b1c78a29838784357"
+        },
+        "fixed_prior_matched": {
+          "attempt_count": 1,
+          "config_sha256": "ce58ba691556e3397fb3e4a56d6ee00b74adb0c3ad7db273bc7b4a6ebe6ee63b",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_fixed_prior_matched",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "acd6987f9e7ac4a45605eb0aaeaadf390d80cbc0e5e106fac2f37af4f47673b9"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "9368ae88e133de54235d83005aac9d8096610a2314ffeea9c7d2bb56510d04c4",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "d2df632827e9370dd536b7927414bf6001db43c1238841c76f29dd87f5686c3d"
+        },
+        "full_hazard_state_mean": {
+          "attempt_count": 1,
+          "config_sha256": "738cf4d953ef1369366b8a5fb8d4b03535ccc1064722dfdd2f6635fc6620adba",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "2863a920da08f8a11fc14a6ebc267bbb9292fe2b7264c07c887e555e1c34d513"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "762e8f909ec26146d64f757cf306971f9fb89d82f2e503ba9232bf01a7a68d51",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "ee95569bfa56fce9ae69d4528c94f3a8052704b7ac7a6399fd47bcc56380add9"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "6664fc91d8a77dd3b661e3c0e7aa0f7f8d655cd0cc2a9b83ab8a5e33a8ffbbc9",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_in_order_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "0ad77f5706d0bea419579462ebdb2c585842e3230baff2f1249b83c4568b0eb3"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "c8554f4f55770238bef3687fd7333cc779416e8d255bbbe374259116cd5cfb9e",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "ef6ce583b595c5b6679b7690f6a761467a6e865fddd89209bc3bd17ff38e576d"
+        },
+        "no_content": {
+          "attempt_count": 1,
+          "config_sha256": "75808361460957b4229e9c1d514c908abd6f31e5986951bf219e99eab3470960",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "0bfc2551817c85cd3b81a8924b8516a329270b231d9c48c37b301824cd107d8d"
+        },
+        "single_model": {
+          "attempt_count": 1,
+          "config_sha256": "b5466d9b699027486109ba40d02a8a921184a4d688a4b584fb638119bf51d4aa",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "8efbc717c019a4c7b296bb82229850e479cb0f58c3ececdd1267b94c1a195452"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "1.3.0",
+        "h5py": "3.16.0",
+        "minari": "0.5.3",
+        "mujoco": "3.2.3",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "6c71b1bda9f83aa4c1b246279abf4c9a224d57e2c2cc91546e1c0270f6c600c0",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "15dd39b95686",
+      "task": "hopper",
+      "torch": "2.8.0+cu128",
+      "training_seed": 102
+    },
+    {
+      "batch_id": "hopper_seed103",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84",
+        "dataset_metadata": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6",
+        "dynamics": "6f3eb810f2d5a4be7d86565c14260902b1d6ecf49939f9e2a711d7b7ba1cbe50",
+        "policy": "5fd89798ef4b9b2c03b8ead52eaf7f83d0ec93f10b14ab5770445478bdcb85e7"
+      },
+      "methods": {
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "f0bbca06e14069f165635e54adaa1693e36f4cde60976d758f02efdf740ecf73",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "6c27acac135e2c76358bab3906f3f15efcee9d818a5597c73a3caf4bb8e5d3c1"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "a80e52eb4bf3e5828a68c33feb9eb8bd5ba1b14897e680a2c18e8558d85a3f20",
+          "evaluation_key": "direct",
+          "evaluator_method": "direct_observation_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "6c5fd8e001b86e323cf6ca456fc0396b29e321857a7bb22b1d477b38cb61d527"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "ab7b4813db35aa07efd8a2207ea03cfb66882252ab32834e95266ece63e05db6",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "73461c33933f6be8a8f2490214f90926ec8df9a998e1e8d159bc2810781c5117"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "785754f55712ca3102903bc7a24358c203b8127a1c6e13ed07748424be19cda4",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "697ccb26ebe102fa8d840fc2c6c62f763e070793a87bad48954eeac5d27eb34d"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "12ddce78780e4f3d06c7f596f317a88de0271c91eb4c02d531f42bfc2157584a",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_in_order_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "6d4944c5ee8361a91d5a6683138347f50b2f2de8dec7252ba7b9bc5676f053f5"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "60232871fedb9a2113c48a0454c2bc4a8b74d73864c0482e13d84804b7ad53de",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "a2a4b295064911d7211e4940cbf4e7dcafea4fada2bcf63c1d0c4bef17bf6cff"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "1.3.0",
+        "h5py": "3.16.0",
+        "minari": "0.5.3",
+        "mujoco": "3.2.3",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "a0f04ea2847b8f44e26adaeffb3e585249a9ff0b95f77001e562723e4d491260",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "15dd39b95686",
+      "task": "hopper",
+      "torch": "2.8.0+cu128",
+      "training_seed": 103
+    },
+    {
+      "batch_id": "hopper_seed104",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84",
+        "dataset_metadata": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6",
+        "dynamics": "48d200ca4e2a9b465235fb28cd4a4a048e0f0f93a2e93f515d59ec89d4237dab",
+        "policy": "51a8836482f14c1831ae93d43b185d6d824dfd506dd4d28c12e6ab04467bebed"
+      },
+      "methods": {
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "3b234e9d244731d04c41be306560a9849b9952a7b44cefdd24d1af646b2af28e",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "e002c0744a85633819d158885363f8976810a85e2d4c8a7362f96226a9be07d2"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "51317c73c57775bf70ad1a97aa25e5a945de1ebb4e1895a3f6fe37ec51cd3a5a",
+          "evaluation_key": "direct",
+          "evaluator_method": "direct_observation_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "826e4bdd8740b69c01c0db75a2cdea67c12d44b8be8df2a8b40e4ac4f52cebc6"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "0973d4b812c5ef2bd21476dfa828bc6cfd183150dcb11cb5208125f8488cb646",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "386c5ebb842b9856f489e6622dd5749a9e1db7c4678095f07c9749635f5cd685"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "726ba852e3e70ab4140827dfb491ae076e0fddc87563da6c09f3b786b0d663bb",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "eb191c46a7e786244ec325784a655cfcf150e5738e3edb08524f4d879d25354d"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "02c6ef75e5a38d01068625a684ec723e07bccce44f0811190af86691cbe0c0ee",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_in_order_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "5c8b50b5ddf1398e7f9ef3328af5aa1cd10445c1f4686b99b573da5494685c18"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "33411df5deb828bf1643dfd515ecf5e8e6400a6b465929a32a9084d4ba717345",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "5590593069664cfb5ffc89881a05caf2c94eb7452b17137e861d9a3fb6d0e00c"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "1.3.0",
+        "h5py": "3.16.0",
+        "minari": "0.5.3",
+        "mujoco": "3.2.3",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "4cad7a24ce5fc5324530c702a11779c3a4e6105a3a87c9ab4b0147714a9ce8b1",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "15dd39b95686",
+      "task": "hopper",
+      "torch": "2.8.0+cu128",
+      "training_seed": 104
+    },
+    {
+      "batch_id": "hopper_seed105",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84",
+        "dataset_metadata": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6",
+        "dynamics": "89ccd3b69978b69e2e1bc95878618a8ff728caf3c3ac9ee8c1596ce205c32b90",
+        "policy": "f6352bfff8671b018793c3d6b1b618f529347cbc30b317805e3c2a0ff44995a3"
+      },
+      "methods": {
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "5965a359b01860f13fa40480a7fa968832192513a4f81569a2c83a70e7d3840c",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "42869fb5c0963b6411dcb2d61f50b39ec93b7cc643b2f4ff9585794aced42f93"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "9bc3c1f7ca2ce392ecec53683057169bd7ed4970dd304a47ccd20663c8183561",
+          "evaluation_key": "direct",
+          "evaluator_method": "direct_observation_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "6b6dba80e935690f8cbfb1403b2853031061623b1386e11488827db4c5657ad5"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "f7a2848b1d7a8ec09177aac2a9081fe6df610d2319a0a862e317bcf1008f1552",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "1a5736be2fb9fa298df9128384b2da3754f974a30b3ecbb3d04cc25ca309993f"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "1d33f21ef0cd6f425afe05305b186727c15189c476ef6275de6629b941accb13",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "3bc6d728f27bde248f6a793b947a79ecd4b994724a5610d0769a8da048b93ba2"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "e5f9c203db768e3d767892e2faec1eb9c9ad9c7356093ad6d462111da4f3fde1",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql_ablation_in_order_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "8aef066be2ba3e8026ce4d3e766616d357a597861a3f7165f9939c7760a8122b"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "c790536cf4006c1cefed5cb446ea6a25d03863a71d6afbc4d39c0098f46b4f18",
+          "evaluation_key": "cadr",
+          "evaluator_method": "cadr_iql",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "04a280557079d4cb31072f437674bd155fe07da481a146141b7f5741233bc5b1"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "1.3.0",
+        "h5py": "3.16.0",
+        "minari": "0.5.3",
+        "mujoco": "3.2.3",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "449daeb2a728b21e4bc09f8b4db167e977192e4839eacb2f56965b55832042c5",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "15dd39b95686",
+      "task": "hopper",
+      "torch": "2.8.0+cu128",
+      "training_seed": 105
+    },
+    {
+      "batch_id": "pickcube_seed101",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "2532b37a4086e8fce9ec18781f38b2552bba5bf146e6b83e96d293905812c59c",
+        "dataset_metadata": "8b7d4d78715aac218eb50c5d1584c21501959b756b2a6dc896a1ea1f3e8df167",
+        "dynamics": "0e15a34cb24e1c69321029fe02ef0b82c29829dc24b2ace877c1132e2dae5820",
+        "policy": "713ff18c9dcfac416350fd77c9a636cdfa70001780d3a00f3e6b5e7a1ad6a527"
+      },
+      "methods": {
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "b1af79939c6366c7e91067d06a421ada3bcf1277b624dfb31023ec9a5ab68f91",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "341e1c88746de77a3563c38e54ebb21826f27def3b04dabba4237f79e11a4ec1"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "a83428d19101e69ce6a402372f15955ec27c4fb41a5ca878a102a3e1523da520",
+          "evaluation_key": "direct",
+          "evaluator_method": "official_maniskill_dp_direct_delayed_observation",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "9dfc5e2a49c976852f9735c29ce3aec01e51f6d04efcc0e52286c506c7cad511"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "9dd447b2244303be4dee02b7ecd18e33444968843560ded04cac5f6379933663",
+          "evaluation_key": "cadr_dp",
+          "evaluator_method": "cadr_posterior_state_reconstruction_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "034c9e8de1b91512267b10d767d34ff8d026bc8dbbe9af639e34f773ec69213f"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "a3dc8e91012a0aa27925a91341d65e6bf281929e194f838fcac803f54d0d2d80",
+          "evaluation_key": "cadr_dp",
+          "evaluator_method": "cadr_posterior_state_reconstruction_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "e994df3c9e9c6bcd58603d6771abb5522b387be3a3a89df6369ad33bbde7a4f4"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "e9aba30cf4003d4d16a633597b50abdbbc5f0a72eba2827b1ea82cf04b23a4ad",
+          "evaluation_key": "cadr_dp_in_order_age",
+          "evaluator_method": "cadr_dp_ablation_in_order_age_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "975be1fa4db0d8c47509396584dbe8a996bf61bce4d94d07d280e65c57ece6d9"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "428fc474f802bb6b590f49139e5068d6d9ba3fdf794395a80fee17694c6fb8a3",
+          "evaluation_key": "cadr_dp_no_censoring",
+          "evaluator_method": "cadr_dp_ablation_no_censoring_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "b5a31a53d8756c543c13a0fbdabd6df7cacc74c1c2cbb5b7fff288a68f813e84"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "0.29.1",
+        "h5py": "3.16.0",
+        "mani-skill": "3.0.1",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "sapien": "3.0.3",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "c45d471f1a8379b2bee3f21d7e628b2a6ad34cc2edcdd2841e3af71874e902de",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "c8318c7733fb",
+      "task": "pickcube",
+      "torch": "2.8.0+cu128",
+      "training_seed": 101
+    },
+    {
+      "batch_id": "pickcube_seed102",
+      "cuda": "12.8",
+      "device": "Tesla T4",
+      "driver": "580.82.07",
+      "gpu_memory_mib": "15360",
+      "gpu_model": "Tesla T4",
+      "input_digests": {
+        "dataset": "2532b37a4086e8fce9ec18781f38b2552bba5bf146e6b83e96d293905812c59c",
+        "dataset_metadata": "8b7d4d78715aac218eb50c5d1584c21501959b756b2a6dc896a1ea1f3e8df167",
+        "dynamics": "8e8394c3e18696f2f1e0c5f4c841f8dd3e5954dd238a7af51249071880b5e522",
+        "policy": "42bea41adb3f441b6f71782aac90a1ae63c9d6369177f050b7315ee1446066c5"
+      },
+      "methods": {
+        "cadr_oracle_age": {
+          "attempt_count": 1,
+          "config_sha256": "cdc6772f219c5865589c1f515b544b7c87eea67b89586cd5f729c4fd4d3edf5d",
+          "evaluation_key": "cadr_oracle_age",
+          "evaluator_method": "cadr_oracle_age",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "9058558c1c611ce0ed5874dde9e06044c91f783c4ffeb3aa6d3869fc02881b09"
+        },
+        "direct": {
+          "attempt_count": 1,
+          "config_sha256": "cd2fc52fc27083f2c6d3548c7e7298407971c169233ea84b8108aa9fcbf484d7",
+          "evaluation_key": "direct",
+          "evaluator_method": "official_maniskill_dp_direct_delayed_observation",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "95065b24b1ddcb3bee9d22acf3582f45f164d28337131cfda31cfc2ff142a2f6"
+        },
+        "full_hazard": {
+          "attempt_count": 1,
+          "config_sha256": "eec5e5332624ffa9891dee790977cd11ba76de9e3ee8a13a288af52524317bba",
+          "evaluation_key": "cadr_dp",
+          "evaluator_method": "cadr_posterior_state_reconstruction_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "35197d59f36ce5af0c0048a1e99fe4e853896dbc18149961d912147efafe0544"
+        },
+        "full_legacy": {
+          "attempt_count": 1,
+          "config_sha256": "da97690738a989bb6f23558da37895156fff5e36700d5b0ad4522b449cdb4689",
+          "evaluation_key": "cadr_dp",
+          "evaluator_method": "cadr_posterior_state_reconstruction_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "b9ebec34e0b70748718edcde6404cf3934427816172eb84e8c5c4dfbc5391d60"
+        },
+        "in_order_age": {
+          "attempt_count": 1,
+          "config_sha256": "18323b12266cff6f0f093aa9c45cce8fde183f483021230eeda24ea2ccf5f283",
+          "evaluation_key": "cadr_dp_in_order_age",
+          "evaluator_method": "cadr_dp_ablation_in_order_age_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "e2386e7281deab652d03caad50341b1083b20e69e9810099866fa0903d0f61c3"
+        },
+        "no_censoring": {
+          "attempt_count": 1,
+          "config_sha256": "92265710a4e8c46eebf8cd9a8bfee0f215a260b67627e88808bfc2f142f6596c",
+          "evaluation_key": "cadr_dp_no_censoring",
+          "evaluator_method": "cadr_dp_ablation_no_censoring_plus_official_maniskill_dp",
+          "native_crash_count": 0,
+          "resume_count": 0,
+          "summary_sha256": "69ec70fefaae01741307cd4bdcf51474dde1a172d4104d2b1373e890c3b03eb5"
+        }
+      },
+      "package_versions": {
+        "gymnasium": "0.29.1",
+        "h5py": "3.16.0",
+        "mani-skill": "3.0.1",
+        "numpy": "2.3.2",
+        "python": "3.12.15",
+        "sapien": "3.0.3",
+        "torch": "2.8.0+cu128"
+      },
+      "receipt_sha256": "e778d382283506b887c2847b3387a8489de8f8fe9fb173040f9c76a810be87b9",
+      "source_tree_sha256": "f4e863acdf98395ea352e98745e9ca28e29f20a21e1750b2dcc4ca4d8e3fa7ec",
+      "status": "complete",
+      "stratum": "c8318c7733fb",
+      "task": "pickcube",
+      "torch": "2.8.0+cu128",
+      "training_seed": 102
+    }
+  ],
+  "bootstrap": {
+    "method": "paired_seed_then_episode_percentile",
+    "resamples": 10000,
+    "seed": 20261124
+  },
+  "expected_episodes": 13200,
+  "plan_sha256": "2b990129936cff5a052bbbb7d8ed52f8ff9285ed9609c9a7d27440a832d355b2",
+  "schema_version": 1,
+  "stage": "p2a",
+  "verified_episodes": 13200
+}
