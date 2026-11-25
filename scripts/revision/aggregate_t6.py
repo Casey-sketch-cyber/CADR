@@ -451,8 +451,8 @@ def assess_decision(hopper: list[dict], pickcube: list[dict]) -> dict:
     def direction(contrast: str, scenario: str) -> str:
         return authoritative[contrast, scenario]["interval_direction"]
 
-    # The four priority scenarios in the review define the Route A gate. The
-    # all-scenario legacy negatives remain visible for reviewer interpretation.
+    # Route A checks in-order age in the four priority scenarios and checks
+    # the legacy posterior in every Hopper scenario.
     positive_in_order = [scene for scene in PRIORITY if direction("hazard_vs_in_order", scene) == "positive"]
     negative_in_order = [scene for scene in PRIORITY if direction("hazard_vs_in_order", scene) == "negative"]
     negative_legacy = [scene for scene in SCENARIOS["hopper"] if direction("hazard_vs_legacy", scene) == "negative"]
@@ -462,7 +462,7 @@ def assess_decision(hopper: list[dict], pickcube: list[dict]) -> dict:
     positive_censoring = [scene for scene in long_delay if direction("censoring", scene) == "positive"]
     return {
         **answer, "status": "reviewable", "route_a_criteria_met": (
-            len(positive_in_order) >= 2 and not negative_in_order and not set(PRIORITY) & set(negative_legacy)
+            len(positive_in_order) >= 2 and not negative_in_order and not negative_legacy
         ),
         "priority_positive_hazard_vs_in_order": positive_in_order,
         "priority_clearly_negative_hazard_vs_in_order": negative_in_order,
