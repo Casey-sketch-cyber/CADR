@@ -20,7 +20,10 @@ from .evaluation_methods import select_evaluation_methods
 from .matched_prior import MATCHED_PRIOR_IQL_METHOD, matched_delay_priors
 from .oracle_age_eval import (
     CADR_ORACLE_AGE_METHOD,
+    CADR_ORACLE_AGE_OFFSET_METHOD,
     OracleAgeCadrController,
+    OracleAgeOffsetCadrController,
+    configured_oracle_age_offset,
     include_cadr_oracle_age,
 )
 from .provenance import (
@@ -54,6 +57,7 @@ def run(
     config = json.loads(config_path.read_text(encoding="utf-8"))
     matched_priors = matched_delay_priors(config)
     include_oracle = include_cadr_oracle_age(config)
+    oracle_age_offset = configured_oracle_age_offset(config)
     quantile_method = upper_quantile_method(config)
     if quantile_method and (include_oracle or matched_priors):
         raise ValueError("upper_quantile uses a separate config from oracle age and matched priors")
@@ -66,9 +70,14 @@ def run(
         raise ValueError("simple baselines and the privileged CADR oracle use separate configs")
     if simple_baseline and matched_priors:
         raise ValueError("simple baselines and the matched-prior ablation use separate configs")
-    available_methods = ("direct", "cadr") if include_cadr else ("direct",)
-    if include_oracle:
-        available_methods += (CADR_ORACLE_AGE_METHOD,)
+    if oracle_age_offset is not None:
+        if not include_cadr or matched_priors or simple_baseline or quantile_method:
+            raise ValueError("oracle_age_offset uses its own frozen CADR evaluation config")
+        available_methods = (CADR_ORACLE_AGE_OFFSET_METHOD,)
+    else:
+        available_methods = ("direct", "cadr") if include_cadr else ("direct",)
+        if include_oracle:
+            available_methods += (CADR_ORACLE_AGE_METHOD,)
     selected_methods = select_evaluation_methods(
         config, available_methods, aliases={quantile_method: "cadr"} if quantile_method else None,
     )
@@ -192,6 +201,10 @@ def run(
         summary["evaluation_methods"] = list(selected_methods)
     if CADR_ORACLE_AGE_METHOD in selected_methods:
         summary["included_privileged_cadr_oracle_age"] = True
+    if oracle_age_offset is not None:
+        summary["information_boundary"] = "privileged_selected_age_evaluation_only"
+        summary["included_privileged_cadr_oracle_age_offset"] = True
+        summary["oracle_age_offset"] = oracle_age_offset
     if fixed_horizons:
         summary["fixed_horizon_by_scenario"] = fixed_horizons
     if partial_path.is_file():
@@ -221,7 +234,7 @@ def run(
                 method=f"direct_observation_{base_algorithm}",
                 **evaluation_arguments,
             )
-        if "cadr" in selected_methods or CADR_ORACLE_AGE_METHOD in selected_methods:
+        if "cadr" in selected_methods or CADR_ORACLE_AGE_METHOD in selected_methods or oracle_age_offset is not None:
             cadr_arguments = {
                 "agent": agent,
                 "dynamics": dynamics,
@@ -264,6 +277,15 @@ def run(
                 scenario_results[CADR_ORACLE_AGE_METHOD] = evaluate_controller(
                     controller_factory=lambda: OracleAgeCadrController(**cadr_arguments),
                     method=CADR_ORACLE_AGE_METHOD,
+                    privileged_selected_age=True,
+                    **evaluation_arguments,
+                )
+            if oracle_age_offset is not None:
+                scenario_results[CADR_ORACLE_AGE_OFFSET_METHOD] = evaluate_controller(
+                    controller_factory=lambda: OracleAgeOffsetCadrController(
+                        oracle_age_offset=oracle_age_offset, **cadr_arguments,
+                    ),
+                    method=CADR_ORACLE_AGE_OFFSET_METHOD,
                     privileged_selected_age=True,
                     **evaluation_arguments,
                 )

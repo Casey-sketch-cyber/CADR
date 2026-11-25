@@ -1,0 +1,376 @@
+{
+  "decision_scenarios": [
+    "fixed_delay_4",
+    "fixed_delay_8",
+    "markov_switching",
+    "ood_support_shift"
+  ],
+  "descriptive_scenarios": [
+    "iid_in_support"
+  ],
+  "eval_episodes": 20,
+  "new_episodes": 800,
+  "p2a_plan_sha256": "2b990129936cff5a052bbbb7d8ed52f8ff9285ed9609c9a7d27440a832d355b2",
+  "preflight": {
+    "config": "configs/hopper_seed101_offset_0.json",
+    "config_sha256": "7b6b68aabf5bfc386de863ad431751ba3433ebaeeb6a9609ec884f27179bbfa1",
+    "inputs": [
+      {
+        "bytes": 3964423,
+        "path": "runs/formal_v1_iql_hopper_seed101/checkpoint.pt",
+        "role": "policy",
+        "sha256": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+      },
+      {
+        "bytes": 4401637,
+        "path": "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt",
+        "role": "dynamics",
+        "sha256": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8"
+      },
+      {
+        "bytes": 139555224,
+        "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+        "role": "dataset",
+        "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+      },
+      {
+        "bytes": 1595,
+        "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+        "role": "dataset_metadata",
+        "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+      }
+    ],
+    "offset": 0,
+    "run_id": "hopper_seed101_offset_0",
+    "scenarios": [
+      "fixed_delay_8"
+    ],
+    "seed": 101
+  },
+  "preflight_episodes": 20,
+  "reference_episodes": 200,
+  "runs": [
+    {
+      "config": "configs/hopper_seed101_offset_m2.json",
+      "config_sha256": "1cbdcb9b15e5dfb354324ee6a1e969b7751d442e545c68251f903cddc78b5b1f",
+      "inputs": [
+        {
+          "bytes": 3964423,
+          "path": "runs/formal_v1_iql_hopper_seed101/checkpoint.pt",
+          "role": "policy",
+          "sha256": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+        },
+        {
+          "bytes": 4401637,
+          "path": "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": -2,
+      "run_id": "hopper_seed101_offset_m2",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 101
+    },
+    {
+      "config": "configs/hopper_seed101_offset_m1.json",
+      "config_sha256": "00f7bc53e2001982a4ff966b88b5c76ee180680b49c43e82b118503557ffb75e",
+      "inputs": [
+        {
+          "bytes": 3964423,
+          "path": "runs/formal_v1_iql_hopper_seed101/checkpoint.pt",
+          "role": "policy",
+          "sha256": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+        },
+        {
+          "bytes": 4401637,
+          "path": "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": -1,
+      "run_id": "hopper_seed101_offset_m1",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 101
+    },
+    {
+      "config": "configs/hopper_seed101_offset_p1.json",
+      "config_sha256": "dbd7d7e553c24df6e9fd8d4f450629b9070822d2bbacf6e305a6d523fb85e2e0",
+      "inputs": [
+        {
+          "bytes": 3964423,
+          "path": "runs/formal_v1_iql_hopper_seed101/checkpoint.pt",
+          "role": "policy",
+          "sha256": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+        },
+        {
+          "bytes": 4401637,
+          "path": "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": 1,
+      "run_id": "hopper_seed101_offset_p1",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 101
+    },
+    {
+      "config": "configs/hopper_seed101_offset_p2.json",
+      "config_sha256": "dfb0bb169ce029fb6d7438bc11301e1148f1b3778d092c1ab3ffca46a8586e6f",
+      "inputs": [
+        {
+          "bytes": 3964423,
+          "path": "runs/formal_v1_iql_hopper_seed101/checkpoint.pt",
+          "role": "policy",
+          "sha256": "8a5be78f2b5a3e8aa004608b74356b609f17a5eb7e7816ed0d4ece477528b8c3"
+        },
+        {
+          "bytes": 4401637,
+          "path": "runs/formal_v1_cadr_hopper_seed101/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "1e6fe10e259d162d93be9e1fb1220beff830455a1d73d25530e41e67c67513e8"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": 2,
+      "run_id": "hopper_seed101_offset_p2",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 101
+    },
+    {
+      "config": "configs/hopper_seed102_offset_m2.json",
+      "config_sha256": "5e1224b85183e0449256ad01771a2e37e57da1e9582bc3fa01b8f67520dba759",
+      "inputs": [
+        {
+          "bytes": 3964551,
+          "path": "runs/formal_v1_iql_hopper_seed102/checkpoint.pt",
+          "role": "policy",
+          "sha256": "89ef96b0258b508a9246a84805895720188b034738789bf89ab0ed3082a22853"
+        },
+        {
+          "bytes": 4401701,
+          "path": "runs/formal_v1_cadr_hopper_seed102/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "75b2d4de00a5511f82c0bfaf5ea8afe0f15d6f01f34d70ff75c9abf045da56d0"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": -2,
+      "run_id": "hopper_seed102_offset_m2",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 102
+    },
+    {
+      "config": "configs/hopper_seed102_offset_m1.json",
+      "config_sha256": "56e289987527863ff8dda4fb6894a716f1bf41dd97ebd067eb7e8a977f682437",
+      "inputs": [
+        {
+          "bytes": 3964551,
+          "path": "runs/formal_v1_iql_hopper_seed102/checkpoint.pt",
+          "role": "policy",
+          "sha256": "89ef96b0258b508a9246a84805895720188b034738789bf89ab0ed3082a22853"
+        },
+        {
+          "bytes": 4401701,
+          "path": "runs/formal_v1_cadr_hopper_seed102/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "75b2d4de00a5511f82c0bfaf5ea8afe0f15d6f01f34d70ff75c9abf045da56d0"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": -1,
+      "run_id": "hopper_seed102_offset_m1",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 102
+    },
+    {
+      "config": "configs/hopper_seed102_offset_p1.json",
+      "config_sha256": "3a54775a30f734554bcd9c58204ca376ed85a2b5db6cd66eae346129a3a85648",
+      "inputs": [
+        {
+          "bytes": 3964551,
+          "path": "runs/formal_v1_iql_hopper_seed102/checkpoint.pt",
+          "role": "policy",
+          "sha256": "89ef96b0258b508a9246a84805895720188b034738789bf89ab0ed3082a22853"
+        },
+        {
+          "bytes": 4401701,
+          "path": "runs/formal_v1_cadr_hopper_seed102/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "75b2d4de00a5511f82c0bfaf5ea8afe0f15d6f01f34d70ff75c9abf045da56d0"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": 1,
+      "run_id": "hopper_seed102_offset_p1",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 102
+    },
+    {
+      "config": "configs/hopper_seed102_offset_p2.json",
+      "config_sha256": "17322d7d39b0ab802033a412b5d4331300e917dc5395b15beda93da1159c4876",
+      "inputs": [
+        {
+          "bytes": 3964551,
+          "path": "runs/formal_v1_iql_hopper_seed102/checkpoint.pt",
+          "role": "policy",
+          "sha256": "89ef96b0258b508a9246a84805895720188b034738789bf89ab0ed3082a22853"
+        },
+        {
+          "bytes": 4401701,
+          "path": "runs/formal_v1_cadr_hopper_seed102/dynamics_checkpoint.pt",
+          "role": "dynamics",
+          "sha256": "75b2d4de00a5511f82c0bfaf5ea8afe0f15d6f01f34d70ff75c9abf045da56d0"
+        },
+        {
+          "bytes": 139555224,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/main_data.hdf5",
+          "role": "dataset",
+          "sha256": "17c1b07d01ce461bb9b2866ad0356c542678b66b886b5ed6c066733a75c52c84"
+        },
+        {
+          "bytes": 1595,
+          "path": "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json",
+          "role": "dataset_metadata",
+          "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6"
+        }
+      ],
+      "offset": 2,
+      "run_id": "hopper_seed102_offset_p2",
+      "scenarios": [
+        "fixed_delay_4",
+        "fixed_delay_8",
+        "iid_in_support",
+        "markov_switching",
+        "ood_support_shift"
+      ],
+      "seed": 102
+    }
+  ],
+  "schema_version": 1,
+  "stage": "p2b1"
+}
