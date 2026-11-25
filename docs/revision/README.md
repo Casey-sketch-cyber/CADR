@@ -21,9 +21,23 @@
   - T0a（#14）：同一张 T4、同一会话，P1 合入前后 legacy 配置 1020/1020 回合逐位一致（Hopper 480，PickCube 540）
 - [x] T6 设计（#13）已合并，**有条件批准**，修改见下方
 - [x] T6-runner（#16）已合并：单方法入口、state_mean、ensemble_members、批量运行器、汇总脚本。已在 T4 上验证与旧入口逐位等价（24/24），无时延自检通过
-- [ ] **P2a 快速验证（可以开跑）** → 决策关口
+- [x] P2a 已完成（#18），T6 小修已合并（#19）。**决策：路线 A 按预注册标准未通过**，原因诊断见 [notes/P2a_decision.md](notes/P2a_decision.md)
+- [ ] P2b-1 年龄误差不对称性检验（可以开始）
+- [ ] P2b-2 偏向陈旧的年龄决策（**待作者确认方向**）
 - [ ] P3 完整矩阵、trace 与其余消融
 - [ ] P4 论文重写
+
+## 执行 AI 当前待办（Claude 2026-11-25 审核结论，优先于以下各节）
+
+先读 [notes/P2a_decision.md](notes/P2a_decision.md)。
+
+1. **重新生成 P2a 决策报告**：用合并 #19 之后的 `aggregate_t6.py` 重新生成 `report.md` 和决策 JSON，提交到 `results/revision/T6/`，单独开一个小 PR。预期 `route_a_criteria_met=false`。
+2. **P2b-1 不对称性检验（先交设计 PR，审核后再跑）**：
+   - **新方法**：特权诊断方法 `cadr_oracle_age_offset`，配置项 `oracle_age_offset ∈ {-2, -1, +1, +2}`。每一步使用的年龄 = clip(真实年龄 + offset, 0, min(t, max_delay))，其余与 `cadr_oracle_age` 完全相同，结果标注 privileged。
+   - **范围**：Hopper seed 101/102；场景 `fixed_delay_4`、`fixed_delay_8`、`iid_in_support`、`markov_switching`；每个配置 20 回合，同一类 GPU。用已有的 `cadr_oracle_age`（offset 0）作对照。
+   - **预注册预测**：offset −1 的回报低于 +1，且 4 个场景中至少 3 个配对差值区间不跨零；−2 与 +2 同理。不成立的话，不对称假设被否定，如实报告。
+   - 设计 PR 写明方法实现、配置清单、回合数和预计 GPU 时长（估计 1–2 小时）。
+3. **P2b-2 暂不开始**，等作者确认方向。
 
 ## 执行 AI 当前待办（Claude 2026-11-24 傍晚审核结论，优先于下一节）
 
