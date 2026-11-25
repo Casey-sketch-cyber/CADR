@@ -1,0 +1,124 @@
+{
+  "ack_lag": 1,
+  "age_decision_rule": "posterior_mean",
+  "age_posterior": "hazard",
+  "algorithm": "cadr",
+  "checkpoint_interval": 10000,
+  "cvar_alpha": 0.2,
+  "dataset_id": "mujoco/hopper/medium-v0",
+  "device": "cuda",
+  "diagnostic_float64_dynamics": false,
+  "dynamics_batch_size": 1024,
+  "dynamics_hidden_dims": [
+    256,
+    256
+  ],
+  "dynamics_learning_rate": 0.0003,
+  "dynamics_training_steps": 50000,
+  "ensemble_size": 5,
+  "entropy_gate_threshold": 1.4,
+  "eval_episodes": 20,
+  "eval_seed": 31000001,
+  "evaluation_methods": [
+    "cadr_oracle_age_offset"
+  ],
+  "experiment_series": "ablation_v2_p2b1_hopper",
+  "include_cadr_oracle_age": false,
+  "include_oracle_upper_bound": false,
+  "log_interval": 1000,
+  "max_delay": 32,
+  "measure_controller_timing": true,
+  "oracle_age_offset": -2,
+  "posterior_decay_time": 48.0,
+  "posterior_memory_steps": 128,
+  "posterior_prior_strength": 2.0,
+  "posterior_updates": true,
+  "required_methods": [
+    "cadr_oracle_age_offset"
+  ],
+  "risk_blend": 0.0,
+  "scenarios": [
+    {
+      "delay": 4,
+      "name": "fixed_delay_4",
+      "type": "fixed"
+    },
+    {
+      "delay": 8,
+      "name": "fixed_delay_8",
+      "type": "fixed"
+    },
+    {
+      "delays": [
+        0,
+        1,
+        2
+      ],
+      "name": "iid_in_support",
+      "probabilities": [
+        0.65,
+        0.25,
+        0.1
+      ],
+      "type": "categorical"
+    },
+    {
+      "name": "markov_switching",
+      "regimes": [
+        {
+          "delays": [
+            0,
+            1,
+            2
+          ],
+          "probabilities": [
+            0.65,
+            0.25,
+            0.1
+          ]
+        },
+        {
+          "delays": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            0.2,
+            0.45,
+            0.35
+          ]
+        }
+      ],
+      "transition": [
+        [
+          0.96,
+          0.04
+        ],
+        [
+          0.1,
+          0.9
+        ]
+      ],
+      "type": "markov"
+    },
+    {
+      "delays": [
+        8,
+        12,
+        16
+      ],
+      "name": "ood_support_shift",
+      "probabilities": [
+        0.2,
+        0.45,
+        0.35
+      ],
+      "type": "categorical"
+    }
+  ],
+  "seed": 102,
+  "use_censoring": true,
+  "use_content_conditioning": true,
+  "validation_batch_size": 8192
+}

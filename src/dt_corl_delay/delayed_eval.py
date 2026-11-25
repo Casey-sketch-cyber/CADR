@@ -14,6 +14,7 @@ import torch
 from .channel import DelayedObservationChannel, PolicyInput
 from .controllers import DirectObservationController
 from .delay_process import build_delay_process
+from .oracle_age_eval import CADR_ORACLE_AGE_OFFSET_METHOD, OracleAgeOffsetCadrController
 
 
 def _cvar(values: list[float], alpha: float) -> float:
@@ -196,6 +197,9 @@ def evaluate_controller(
     controller_timing_device: torch.device | None = None,
 ) -> dict[str, Any]:
     """Evaluate a frozen controller and optionally synchronize its step timer."""
+    use_offset_oracle = method == CADR_ORACLE_AGE_OFFSET_METHOD
+    if use_offset_oracle and not privileged_selected_age:
+        raise ValueError("cadr_oracle_age_offset requires privileged selected age")
     if controller_timing_device is not None and controller_timing_device.type not in {
         "cpu",
         "cuda",
@@ -217,6 +221,7 @@ def evaluate_controller(
     episode_post_change_success_occupancies: list[float] = []
     episode_seeds: list[int] = []
     recovery_steps: list[int] = []
+    offset_decisions = effective_offset_sum = fully_clipped_steps = 0
     horizon = _environment_horizon(env, environment_config)
 
     for episode in range(episodes):
@@ -229,6 +234,9 @@ def evaluate_controller(
         )
         channel.reset(np.asarray(observation).copy())
         controller = controller_factory()
+        offset_controller = controller if isinstance(controller, OracleAgeOffsetCadrController) else None
+        if use_offset_oracle != (offset_controller is not None):
+            raise ValueError("cadr_oracle_age_offset requires its dedicated privileged controller and method label")
         episode_seed_setter = getattr(controller, "set_episode_seed", None)
         if episode_seed_setter is not None:
             episode_seed_setter(episode_seed)
@@ -302,6 +310,13 @@ def evaluate_controller(
                 )
         for name, value in controller.diagnostics().items():
             controller_diagnostics.setdefault(name, []).append(float(value))
+        if offset_controller is not None:
+            decision_steps, offset_sum, clipped_steps = offset_controller.age_offset_counts()
+            if decision_steps != episode_length:
+                raise RuntimeError("offset oracle must record one age decision per executed step")
+            offset_decisions += decision_steps
+            effective_offset_sum += offset_sum
+            fully_clipped_steps += clipped_steps
     env.close()
 
     latency = np.asarray(inference_times_ms)
@@ -328,6 +343,14 @@ def evaluate_controller(
         "inference_ms_p50": float(np.percentile(latency, 50)),
         "inference_ms_p95": float(np.percentile(latency, 95)),
     }
+    if use_offset_oracle:
+        result["age_offset_diagnostics"] = {
+            "decision_steps": offset_decisions,
+            "effective_offset_sum": effective_offset_sum,
+            "fully_clipped_steps": fully_clipped_steps,
+            "mean_applied_offset": effective_offset_sum / offset_decisions,
+            "fully_clipped_fraction": fully_clipped_steps / offset_decisions,
+        }
     if controller_timing_device is not None:
         result["controller_timing"] = {
             "scope": "controller.act",
