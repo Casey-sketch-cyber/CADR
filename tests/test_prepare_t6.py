@@ -3,11 +3,35 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("prepare_t6_test", ROOT / "scripts/revision/prepare_t6.py")
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+
+
+def test_supplemental_index_fills_only_original_unhashed_assets(tmp_path):
+    index = ROOT / "docs/revision/handoff"
+    hopper_metadata = "datasets/minari/mujoco/hopper/medium-v0/data/metadata.json"
+    author = MODULE.read_index(index / "data_index.csv", "expected_sha256", "expected_bytes")
+    assert hopper_metadata not in author
+    assert MODULE.read_data_index(index)[hopper_metadata] == {
+        "path": hopper_metadata,
+        "bytes": 1595,
+        "sha256": "28a2dc4dfa9d152be726b7726eec5c817fa3be984f1b60393cad215625a600b6",
+    }
+
+    header = "server_relative_path,expected_bytes,expected_sha256\n"
+    (tmp_path / "data_index.csv").write_text(
+        header + f"{hopper_metadata},1595,{'a' * 64}\n", encoding="utf-8"
+    )
+    (tmp_path / "supplemental_hashes.csv").write_text(
+        header + f"{hopper_metadata},1595,{'b' * 64}\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="fill a missing author-index hash"):
+        MODULE.read_data_index(tmp_path)
 
 
 def test_prepare_exact_reviewed_p2a_matrix(tmp_path):

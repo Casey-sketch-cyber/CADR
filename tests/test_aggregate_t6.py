@@ -68,6 +68,14 @@ def test_decision_uses_hopper_priority_intervals(module):
     outcome = module.assess_decision(rows, [])
     assert outcome["route_a_criteria_met"] and outcome["censoring_title_criterion_met"]
     assert not outcome["route_b_discussion_flag"]
+
+    fixed_legacy = next(row for row in rows if row["contrast"] == "hazard_vs_legacy"
+                        and row["scenario"] == "fixed_delay_1")
+    fixed_legacy.update(interval_direction="negative", delta=-1, ci95_low=-2, ci95_high=-0.5)
+    outcome = module.assess_decision(rows, [])
+    assert outcome["priority_positive_hazard_vs_in_order"] == list(module.PRIORITY[:2])
+    assert outcome["all_clearly_negative_hazard_vs_legacy"] == ["fixed_delay_1"]
+    assert not outcome["route_a_criteria_met"]
     assert module.assess_decision(rows[:-1], [])["status"] == "insufficient_complete_homogeneous_hopper_data"
 
 

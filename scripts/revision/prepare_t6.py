@@ -105,6 +105,23 @@ def read_index(path: Path, digest_column: str, size_column: str) -> dict[str, di
     return assets
 
 
+def read_data_index(index: Path) -> dict[str, dict[str, Any]]:
+    original = index / "data_index.csv"
+    data = read_index(original, "expected_sha256", "expected_bytes")
+    supplemental = read_index(
+        index / "supplemental_hashes.csv", "expected_sha256", "expected_bytes"
+    )
+    with original.open(encoding="utf-8-sig", newline="") as stream:
+        author_rows = {row["server_relative_path"]: row for row in csv.DictReader(stream)}
+    for name, record in supplemental.items():
+        author = author_rows.get(name)
+        if author is None or author["expected_sha256"]:
+            raise ValueError(f"supplement may only fill a missing author-index hash: {name}")
+        if not author["expected_bytes"] or record.get("bytes") != int(author["expected_bytes"]):
+            raise ValueError(f"supplement differs from the author-index byte count: {name}")
+    return data | supplemental
+
+
 def batch_inputs(
     task: str, seed: int, template: dict[str, Any],
     weights: dict[str, dict[str, Any]], data: dict[str, dict[str, Any]],
@@ -145,7 +162,7 @@ def write_config(path: Path, value: dict[str, Any]) -> str:
 def prepare(project_root: Path, output: Path) -> dict[str, Any]:
     index = project_root / "docs/revision/handoff"
     weights = read_index(index / "checkpoint_index.csv", "recorded_sha256", "bytes")
-    data = read_index(index / "data_index.csv", "expected_sha256", "expected_bytes")
+    data = read_data_index(index)
     manifest: dict[str, Any] = {"schema_version": 1, "stage": "p2a", "batches": []}
     for task, seeds in TASK_SEEDS.items():
         template_pattern = HOPPER_TEMPLATE if task == "hopper" else PICKCUBE_TEMPLATE
